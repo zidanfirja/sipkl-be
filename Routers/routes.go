@@ -14,6 +14,7 @@ func SetupRouter() *gin.Engine {
 		v1.GET("/role", Controllers.GetAllRole)
 		v1.POST("/role", Controllers.CreateNewRole)
 		v1.DELETE("/role", Controllers.DeleteRole)
+		v1.PUT("/role", Controllers.UpdateRole)
 
 	}
 	return route

@@ -22,6 +22,11 @@ type DeleteRoleReq struct {
 	ID interface{} `json:"id" binding:"required"`
 }
 
+type UpdateRoleReq struct {
+	ID      interface{}            `json:"id" binding:"required"`
+	Payload map[string]interface{} `json:"payload" binding:"required"`
+}
+
 func GetRoles() ([]Role, error) {
 
 	var roleModel []Role
@@ -44,7 +49,7 @@ func CreateRole(role *Role) error {
 }
 
 func DeleteRole(id int) error {
-	fmt.Println(id)
+
 	delete := DB.Database.Where("id = ?", id).Delete(&Role{})
 
 	if delete.RowsAffected == 0 {
@@ -55,5 +60,42 @@ func DeleteRole(id int) error {
 		fmt.Println(delete.Error)
 		return delete.Error
 	}
+	return nil
+}
+
+func UpdateSingleRole(id int, payload map[string]interface{}) error {
+
+	var role Role
+	result := DB.Database.First(&role, id)
+	if err := result.Error; err != nil {
+		return errors.New("role dengan ID tersebut tidak ditemukan")
+	}
+
+	// Jika tidak ada baris yang terupdate, kembalikan error
+	if result.RowsAffected == 0 {
+		return errors.New("tidak ada role yang diupdate")
+	}
+
+	// Update role berdasarkan payload
+	if err := DB.Database.Model(&role).Updates(payload).Error; err != nil {
+		return err
+	}
+	return nil
+
+}
+
+// Fungsi untuk mengupdate banyak role berdasarkan array ID
+func UpdateMultipleRoles(ids []int, payload map[string]interface{}) error {
+	// Update role berdasarkan payload dan ID array
+	result := DB.Database.Model(&Role{}).Where("id IN ?", ids).Updates(payload)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	// Jika tidak ada baris yang terupdate, kembalikan error
+	if result.RowsAffected == 0 {
+		return errors.New("tidak ada role yang diupdate")
+	}
+
 	return nil
 }

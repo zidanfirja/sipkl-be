@@ -100,3 +100,75 @@ func DeleteRole(c *gin.Context) {
 		"massage": "Berhasil menghapus role",
 	})
 }
+
+func UpdateRole(c *gin.Context) {
+	var role Models.UpdateRoleReq
+
+	errBindJson := c.ShouldBindJSON(&role)
+	if errBindJson != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": errBindJson.Error(),
+		})
+		return
+	}
+
+	// cek 'aktif' ada  payload
+	if aktifValue, ok := role.Payload["aktif"]; ok {
+		switch aktif := aktifValue.(type) {
+		case bool:
+			// dikosongkan karena jika ini bool juga betul
+		case float64:
+
+			if aktif != 0 && aktif != 1 {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"error": "'aktif' harus berupa true, false, 1, atau 0",
+				})
+				return
+			}
+			// Konversi angka ke boolean
+			role.Payload["aktif"] = aktif == 1
+		default:
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "'aktif' harus berupa true, false, 1, atau 0",
+			})
+			return
+		}
+	}
+
+	switch ids := role.ID.(type) {
+	case float64:
+		err := Models.UpdateSingleRole(int(ids), role.Payload)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Role berhasil diupdate",
+			"id":      int(ids),
+		})
+	case []interface{}:
+
+		intIDs := make([]int, 0)
+
+		for _, id := range ids {
+			if idFloat, ok := id.(float64); ok {
+				intIDs = append(intIDs, int(idFloat))
+			}
+		}
+
+		err := Models.UpdateMultipleRoles(intIDs, role.Payload)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Role berhasil diupdate",
+			"ids":     intIDs,
+		})
+	}
+
+}
