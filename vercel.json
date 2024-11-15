@@ -1,15 +1,9 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "main.go",
-        "use": "@vercel/go"
-      }
-    ],
-    "routes": [
-      {
-        "source": "/",
-        "dest": "main.go"
-      }
-    ]
-  }
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/main.go"
+    }
+  ]
+}
