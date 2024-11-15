@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"go-gin-mysql/Database"
 	"go-gin-mysql/Models"
 	"go-gin-mysql/Routers"
+	"os"
 )
 
 func main() {
@@ -17,8 +17,12 @@ func main() {
 	// userService := Controller.RoleCOntroller(roleModel)
 	//
 	// Mengatur router Gin
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 	router := Routers.SetupRouter()
-	fmt.Println("Run at localhost:8080")
-	router.Run(":8080")
+	router.Run(":" + port)
 
 }
