@@ -20,15 +20,6 @@ func SetupRouter() *gin.Engine {
 		})
 	})
 
-	// route.Use(cors.New(cors.Config{
-	// 	AllowOrigins:     []string{"https://sipkl.smkpunegerijabar.sch.id"},
-	// 	AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-	// 	AllowHeaders:     []string{"Content-Type", "Authorization"},
-	// 	ExposeHeaders:    []string{"Content-Length"},
-	// 	AllowCredentials: true,
-	// 	MaxAge:           12 * time.Hour,
-	// }))
-
 	v1 := route.Group("/sipkl/v1/data/hubin/")
 	{
 		v1.GET("/role", Controllers.GetAllRole)
