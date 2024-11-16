@@ -18,6 +18,7 @@ type DBConfig struct {
 	Host     string
 	Port     string
 	DBName   string
+	DBUrl    string
 }
 
 func LoadDBConfig() DBConfig {
@@ -32,6 +33,7 @@ func LoadDBConfig() DBConfig {
 		Host:     os.Getenv("DB_HOST"),
 		Port:     os.Getenv("DB_PORT"),
 		DBName:   os.Getenv("DB_NAME"),
+		DBUrl:    os.Getenv("DATABASE_URL"),
 	}
 
 }
@@ -45,19 +47,14 @@ func ConnetDB() {
 
 	// postgrest for prod
 
-	// Ambil nilai-nilai dari variabel lingkungan
-	dbUsername := dbConfig.Username
-	dbPassword := dbConfig.Password
-	dbHost := dbConfig.Host
-	dbPort := dbConfig.Port
-	dbName := dbConfig.DBName
+	dsn := dbConfig.DBUrl + "?pgbouncer=true&connection_limit=1"
 
-	dsn := "host=" + dbHost + " user=" + dbUsername + " password=" + dbPassword + " dbname=" + dbName + " port=" + dbPort + " sslmode=disable"
+	// dsn := "host=" + dbHost + " user=" + dbUsername + " password=" + dbPassword + " dbname=" + dbName + " port=" + dbPort + " sslmode=disable" + " pg_stmtcache.mode=describe"
 	Database, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true, // Nonaktifkan pluralisasi nama tabel
 		},
-		// PrepareStmt: false, // Nonaktifkan prepared statement cache (untuk seeding)
+		PrepareStmt: false, // Nonaktifkan prepared statement cache (untuk seeding)
 	})
 	if err != nil {
 		log.Fatalf("Gagal terhubung ke database: %v", err)
@@ -83,6 +80,20 @@ func ConnetDB() {
 	// 	panic("Failed to connect to database!")
 	// }
 
+}
+
+func CloseDB() {
+	db, err := Database.DB()
+	if err != nil {
+		log.Printf("Gagal mendapatkan objek *sql.DB: %v", err)
+		return
+	}
+
+	if err := db.Close(); err != nil {
+		log.Printf("Gagal menutup koneksi database: %v", err)
+	} else {
+		log.Println("Koneksi database berhasil ditutup")
+	}
 }
 
 func AutoMigrate(models ...interface{}) {

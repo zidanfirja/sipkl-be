@@ -20,6 +20,8 @@ func main() {
 	// Seed.SeedKonfigurasiRoles()
 	// Seed.SeedDataSiswa()
 
+	defer Database.CloseDB()
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
