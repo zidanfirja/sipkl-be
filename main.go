@@ -9,13 +9,16 @@ import (
 func main() {
 	Database.ConnetDB()
 
+	// migrate database
 	// Database.AutoMigrate(&Models.Role{}, &Models.Pegawai{}, &Models.KonfigurasiRoles{}, &Models.Industri{}, &Models.DataSiswa{})
 	// Database.DB.Migrator().DropTable(&Models.Role{}, &Models.Pegawai{}, &Models.KonfigurasiRoles{}, &Models.Industri{}, &Models.DataSiswa{})
 
-	// roleModel := Models.RoleModel(db)
-	// userService := Controller.RoleCOntroller(roleModel)
-	//
-	// Mengatur router Gin
+	// seed data
+	// Seed.SeedRole()
+	// Seed.SeedIndustri()
+	// Seed.SeedPegawai()
+	// Seed.SeedKonfigurasiRoles()
+	// Seed.SeedDataSiswa()
 
 	port := os.Getenv("PORT")
 	if port == "" {

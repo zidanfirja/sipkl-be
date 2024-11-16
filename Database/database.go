@@ -2,12 +2,13 @@ package Database
 
 import (
 	"fmt"
-	"log"
+
 	"os"
 
 	"github.com/joho/godotenv"
-	"gorm.io/driver/postgres"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 type DBConfig struct {
@@ -44,33 +45,33 @@ func ConnetDB() {
 	// postgrest for prod
 
 	// Ambil nilai-nilai dari variabel lingkungan
-	dbUsername := dbConfig.Username
-	dbPassword := dbConfig.Password
-	dbHost := dbConfig.Host
-	dbPort := dbConfig.Port
-	dbName := dbConfig.DBName
+	// dbUsername := dbConfig.Username
+	// dbPassword := dbConfig.Password
+	// dbHost := dbConfig.Host
+	// dbPort := dbConfig.Port
+	// dbName := dbConfig.DBName
 
-	dsn := "host=" + dbHost + " user=" + dbUsername + " password=" + dbPassword + " dbname=" + dbName + " port=" + dbPort + " sslmode=disable"
-	Database, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		log.Fatalf("Gagal terhubung ke database: %v", err)
-	}
-	log.Println("Berhasil terhubung ke database PostgreSQL")
+	// dsn := "host=" + dbHost + " user=" + dbUsername + " password=" + dbPassword + " dbname=" + dbName + " port=" + dbPort + " sslmode=disable"
+	// Database, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	// if err != nil {
+	// 	log.Fatalf("Gagal terhubung ke database: %v", err)
+	// }
+	// log.Println("Berhasil terhubung ke database PostgreSQL")
 
 	// mysql for development
-	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-	// 	dbConfig.Username,
-	// 	dbConfig.Password,
-	// 	dbConfig.Host,
-	// 	dbConfig.Port,
-	// 	dbConfig.DBName,
-	// )
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		dbConfig.Username,
+		dbConfig.Password,
+		dbConfig.Host,
+		dbConfig.Port,
+		dbConfig.DBName,
+	)
 
-	// Database, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
-	// 	NamingStrategy: schema.NamingStrategy{
-	// 		SingularTable: true,
-	// 	},
-	// })
+	Database, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			SingularTable: true,
+		},
+	})
 
 	if err != nil {
 		panic("Failed to connect to database!")

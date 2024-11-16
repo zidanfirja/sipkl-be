@@ -1,6 +1,8 @@
 package Models
 
-import "time"
+import (
+	"time"
+)
 
 type Pegawai struct {
 	ID        int    `gorm:"type:int;primaryKey;autoIncrement" json:"id"`

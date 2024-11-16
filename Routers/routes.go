@@ -24,6 +24,11 @@ func SetupRouter() *gin.Engine {
 		v1.DELETE("/role", Controllers.DeleteRole)
 		v1.PUT("/role", Controllers.UpdateRole)
 
+		v1.GET("/industri", Controllers.GetAllIndustri)
+		v1.POST("/industri", Controllers.CreateIndustri)
+		v1.DELETE("/industri", Controllers.DeleteIndustri)
+		v1.PUT("/industri", Controllers.UpdateIndustri)
+
 	}
 	return route
 }

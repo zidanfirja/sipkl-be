@@ -71,12 +71,10 @@ func UpdateSingleRole(id int, payload map[string]interface{}) error {
 		return errors.New("role dengan ID tersebut tidak ditemukan")
 	}
 
-	// Jika tidak ada baris yang terupdate, kembalikan error
 	if result.RowsAffected == 0 {
 		return errors.New("tidak ada role yang diupdate")
 	}
 
-	// Update role berdasarkan payload
 	if err := DB.Database.Model(&role).Updates(payload).Error; err != nil {
 		return err
 	}
@@ -86,13 +84,12 @@ func UpdateSingleRole(id int, payload map[string]interface{}) error {
 
 // Fungsi untuk mengupdate banyak role berdasarkan array ID
 func UpdateMultipleRoles(ids []int, payload map[string]interface{}) error {
-	// Update role berdasarkan payload dan ID array
+
 	result := DB.Database.Model(&Role{}).Where("id IN ?", ids).Updates(payload)
 	if result.Error != nil {
 		return result.Error
 	}
 
-	// Jika tidak ada baris yang terupdate, kembalikan error
 	if result.RowsAffected == 0 {
 		return errors.New("tidak ada role yang diupdate")
 	}
