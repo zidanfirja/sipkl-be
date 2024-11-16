@@ -2,12 +2,11 @@ package Database
 
 import (
 	"fmt"
-	"log"
 
 	"os"
 
 	"github.com/joho/godotenv"
-	"gorm.io/driver/postgres"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )
@@ -47,54 +46,54 @@ func ConnetDB() {
 
 	// postgrest for prod
 
-	dsn := dbConfig.DBUrl + "?pgbouncer=true&connection_limit=1"
+	// dsn := dbConfig.DBUrl + "?pgbouncer=true&connection_limit=1"
 
-	// dsn := "host=" + dbHost + " user=" + dbUsername + " password=" + dbPassword + " dbname=" + dbName + " port=" + dbPort + " sslmode=disable" + " pg_stmtcache.mode=describe"
-	Database, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
-		NamingStrategy: schema.NamingStrategy{
-			SingularTable: true, // Nonaktifkan pluralisasi nama tabel
-		},
-		PrepareStmt: false, // Nonaktifkan prepared statement cache (untuk seeding)
-	})
-	if err != nil {
-		log.Fatalf("Gagal terhubung ke database: %v", err)
-	}
-	log.Println("Berhasil terhubung ke database PostgreSQL")
+	// // dsn := "host=" + dbHost + " user=" + dbUsername + " password=" + dbPassword + " dbname=" + dbName + " port=" + dbPort + " sslmode=disable" + " pg_stmtcache.mode=describe"
+	// Database, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+	// 	NamingStrategy: schema.NamingStrategy{
+	// 		SingularTable: true, // Nonaktifkan pluralisasi nama tabel
+	// 	},
+	// 	PrepareStmt: false, // Nonaktifkan prepared statement cache (untuk seeding)
+	// })
+	// if err != nil {
+	// 	log.Fatalf("Gagal terhubung ke database: %v", err)
+	// }
+	// log.Println("Berhasil terhubung ke database PostgreSQL")
 
 	// mysql for development
-	// dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-	// 	dbConfig.Username,
-	// 	dbConfig.Password,
-	// 	dbConfig.Host,
-	// 	dbConfig.Port,
-	// 	dbConfig.DBName,
-	// )
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		dbConfig.Username,
+		dbConfig.Password,
+		dbConfig.Host,
+		dbConfig.Port,
+		dbConfig.DBName,
+	)
 
-	// Database, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
-	// 	NamingStrategy: schema.NamingStrategy{
-	// 		SingularTable: true,
-	// 	},
-	// })
+	Database, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			SingularTable: true,
+		},
+	})
 
-	// if err != nil {
-	// 	panic("Failed to connect to database!")
-	// }
-
-}
-
-func CloseDB() {
-	db, err := Database.DB()
 	if err != nil {
-		log.Printf("Gagal mendapatkan objek *sql.DB: %v", err)
-		return
+		panic("Failed to connect to database!")
 	}
 
-	if err := db.Close(); err != nil {
-		log.Printf("Gagal menutup koneksi database: %v", err)
-	} else {
-		log.Println("Koneksi database berhasil ditutup")
-	}
 }
+
+// func CloseDB() {
+// 	db, err := Database.DB()
+// 	if err != nil {
+// 		log.Printf("Gagal mendapatkan objek *sql.DB: %v", err)
+// 		return
+// 	}
+
+// 	if err := db.Close(); err != nil {
+// 		log.Printf("Gagal menutup koneksi database: %v", err)
+// 	} else {
+// 		log.Println("Koneksi database berhasil ditutup")
+// 	}
+// }
 
 func AutoMigrate(models ...interface{}) {
 	if err := Database.AutoMigrate(models...); err != nil {

@@ -3,7 +3,9 @@ package Routers
 import (
 	Controllers "go-gin-mysql/Controller"
 	"net/http"
+	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,6 +18,15 @@ func SetupRouter() *gin.Engine {
 			"massage": "halaman pertama",
 		})
 	})
+
+	route.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"https://sipkl.smkpunegerijabar.sch.id"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 
 	v1 := route.Group("/sipkl/v1/data/hubin/")
 	{
@@ -30,6 +41,7 @@ func SetupRouter() *gin.Engine {
 		v1.PUT("/industri", Controllers.UpdateIndustri)
 
 		v1.GET("/pegawai", Controllers.GetAllPegawai)
+		v1.POST("/pegawai", Controllers.CreatePegawai)
 
 	}
 	return route

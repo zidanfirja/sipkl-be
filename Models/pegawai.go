@@ -23,6 +23,16 @@ type Pegawai struct {
 func GetPegawai() ([]Pegawai, error) {
 	var pegawaiModel []Pegawai
 
+	// query := "select"
+	// DB.Database.Exec()
+
 	rows := DB.Database.Find(&pegawaiModel)
 	return pegawaiModel, rows.Error
+}
+
+func CreatePegawai(pegawai *Pegawai) error {
+
+	pegawai.CreatedAt = time.Now()
+	createPegawai := DB.Database.Omit("id").Create(pegawai)
+	return createPegawai.Error
 }

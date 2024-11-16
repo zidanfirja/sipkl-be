@@ -4,9 +4,18 @@ import (
 	"go-gin-mysql/Models"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
+
+type IndustriResponse struct {
+	ID        int       `json:"id"`
+	Nama      string    `json:"nama"`
+	Alamat    string    `json:"alamat"`
+	Jurusan   string    `json:"jurusan"`
+	CreatedAt time.Time `json:"created_at"`
+}
 
 func GetAllIndustri(c *gin.Context) {
 	data, err := Models.GetIdustri()
@@ -17,8 +26,19 @@ func GetAllIndustri(c *gin.Context) {
 		})
 		return
 	}
+
+	var response []IndustriResponse
+	for _, item := range data {
+		response = append(response, IndustriResponse{
+			ID:        item.ID,
+			Nama:      item.Nama,
+			Alamat:    item.Alamat,
+			Jurusan:   item.Jurusan,
+			CreatedAt: item.CreatedAt,
+		})
+	}
 	c.JSON(http.StatusOK, gin.H{
-		"data": data,
+		"data": response,
 	})
 
 }
