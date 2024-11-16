@@ -9,6 +9,7 @@ import (
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
 )
 
 type DBConfig struct {
@@ -52,7 +53,11 @@ func ConnetDB() {
 	dbName := dbConfig.DBName
 
 	dsn := "host=" + dbHost + " user=" + dbUsername + " password=" + dbPassword + " dbname=" + dbName + " port=" + dbPort + " sslmode=disable"
-	Database, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	Database, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			SingularTable: true, // Nonaktifkan pluralisasi nama tabel
+		},
+	})
 	if err != nil {
 		log.Fatalf("Gagal terhubung ke database: %v", err)
 	}
