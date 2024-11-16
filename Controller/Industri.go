@@ -12,7 +12,7 @@ func GetAllIndustri(c *gin.Context) {
 	data, err := Models.GetIdustri()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"massage": "Gagal mengambil data",
+			"message": "Gagal mengambil data",
 			"error":   err.Error(),
 		})
 		return
@@ -30,7 +30,7 @@ func CreateIndustri(c *gin.Context) {
 	err := c.ShouldBindJSON(&industri)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"massage": "data yang dimuat gagal",
+			"message": "data yang dimuat gagal",
 			"error":   err.Error(),
 		})
 		return
@@ -44,7 +44,7 @@ func CreateIndustri(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"massage": "berhasil menambahkan ",
+		"message": "berhasil menambahkan ",
 	})
 }
 
@@ -55,7 +55,7 @@ func DeleteIndustri(c *gin.Context) {
 	err := c.ShouldBindJSON(&deleteReq)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"massage": "masukan data yang seusai",
+			"message": "masukan data yang seusai",
 			"error":   err.Error(),
 		})
 		return
@@ -74,21 +74,21 @@ func DeleteIndustri(c *gin.Context) {
 				ids = append(ids, int(id))
 			} else {
 				c.JSON(http.StatusBadRequest, gin.H{
-					"massage": "input data yang sesuai",
+					"message": "input data yang sesuai",
 				})
 				return
 			}
 		}
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{
-			"massage": "data id tidak sesuai",
+			"message": "data id tidak sesuai",
 		})
 		return
 	}
 
 	if len(ids) == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"massage": "masukan setidaknya 1 industri",
+			"message": "masukan setidaknya 1 industri",
 		})
 		return
 	}
@@ -99,13 +99,13 @@ func DeleteIndustri(c *gin.Context) {
 		if errDeleteIndustri != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error":   errDeleteIndustri.Error(),
-				"massage": "Gagal menghapus id " + strconv.Itoa(id),
+				"message": "Gagal menghapus id " + strconv.Itoa(id),
 			})
 			return
 		}
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"massage": "Berhasil menghapus Industri",
+		"message": "Berhasil menghapus Industri",
 	})
 
 }
@@ -116,7 +116,7 @@ func UpdateIndustri(c *gin.Context) {
 	errBindJson := c.ShouldBindJSON(&industriReq)
 	if errBindJson != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"massage": "error saat binding data",
+			"message": "error saat binding data",
 			"error":   errBindJson.Error(),
 		})
 		return
@@ -125,7 +125,7 @@ func UpdateIndustri(c *gin.Context) {
 	jurusan, ok := industriReq.Payload["jurusan"]
 	if !ok {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"massage": "Kolom jurusan tidak boleh kososng",
+			"message": "Kolom jurusan tidak boleh kososng",
 		})
 		return
 	}
@@ -143,7 +143,7 @@ func UpdateIndustri(c *gin.Context) {
 		err := Models.UpdateSingleIndustri(int(dataId), industriReq.Payload)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
-				"massage": "Gagal update data",
+				"message": "Gagal update data",
 				"error":   err.Error(),
 			})
 			return
@@ -155,7 +155,7 @@ func UpdateIndustri(c *gin.Context) {
 				intIds = append(intIds, int(idFloat))
 			} else {
 				c.JSON(http.StatusBadRequest, gin.H{
-					"massage": "format data id salah",
+					"message": "format data id salah",
 				})
 				return
 			}
@@ -164,7 +164,7 @@ func UpdateIndustri(c *gin.Context) {
 		err := Models.UpdateMultipleIndustri(intIds, jurusanStr)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
-				"massage": "error saat update multiple",
+				"message": "error saat update multiple",
 				"error":   err.Error(),
 			})
 			return
@@ -173,7 +173,7 @@ func UpdateIndustri(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"massage": "data berhasil di update",
+		"message": "data berhasil di update",
 	})
 
 }

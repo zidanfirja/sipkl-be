@@ -1,6 +1,7 @@
 package Models
 
 import (
+	DB "go-gin-mysql/Database"
 	"time"
 )
 
@@ -17,4 +18,11 @@ type Pegawai struct {
 	Fasilitator      []DataSiswa        `gorm:"foreignKey:FKIdFasilitator;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
 
 	CreatedAt time.Time `json:"created_at" gorm:"type:timestamp"`
+}
+
+func GetPegawai() ([]Pegawai, error) {
+	var pegawaiModel []Pegawai
+
+	rows := DB.Database.Find(&pegawaiModel)
+	return pegawaiModel, rows.Error
 }

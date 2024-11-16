@@ -14,7 +14,7 @@ func GetAllRole(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"massage": "Failed to retrieve upcoming shows",
+			"message": "Failed to retrieve upcoming shows",
 			"error":   err.Error(),
 		})
 		return
@@ -44,7 +44,7 @@ func CreateNewRole(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"massage": "Role berhasil ditambahkan",
+		"message": "Role berhasil ditambahkan",
 	})
 
 }
@@ -56,7 +56,7 @@ func DeleteRole(c *gin.Context) {
 	if errDeleteReq != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error":   errDeleteReq.Error(),
-			"massage": "Format request tidak valid",
+			"message": "Format request tidak valid",
 		})
 		return
 	}
@@ -71,7 +71,7 @@ func DeleteRole(c *gin.Context) {
 				ids = append(ids, int(id))
 			} else {
 				c.JSON(http.StatusBadRequest, gin.H{
-					"massage": "Semua ID harus berupa angka",
+					"message": "Semua ID harus berupa angka",
 				})
 				return
 			}
@@ -90,14 +90,14 @@ func DeleteRole(c *gin.Context) {
 		if errDeleteRole != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"error":   errDeleteRole.Error(),
-				"massage": "Gagal menghapus id " + strconv.Itoa(id),
+				"message": "Gagal menghapus id " + strconv.Itoa(id),
 			})
 			return
 		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"massage": "Berhasil menghapus role",
+		"message": "Berhasil menghapus role",
 	})
 }
 

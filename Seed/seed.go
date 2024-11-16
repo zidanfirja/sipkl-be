@@ -22,7 +22,6 @@ func SeedRole() {
 	roles := []*Models.Role{
 		{Nama: "Pembimbing", Aktif: true},
 		{Nama: "Fasilitator", Aktif: true},
-		{Nama: "Manager", Aktif: false},
 	}
 
 	if err := DB.Database.Create(&roles).Error; err != nil {
@@ -45,6 +44,11 @@ func SeedIndustri() {
 		{Nama: "PT. Maju Sejahtera", Alamat: "Jl. Merdeka No. 1", Jurusan: "TKJ", CreatedAt: time.Now()},
 		{Nama: "CV. Karya Mandiri", Alamat: "Jl. Industri No. 45", Jurusan: "RPL", CreatedAt: time.Now()},
 		{Nama: "PT. Teknologi Nusantara", Alamat: "Jl. Sudirman No. 22", Jurusan: "TKJ", CreatedAt: time.Now()},
+		{Nama: "PT. Bangkit", Alamat: "Jl. Bandung No. 21", Jurusan: "RPL", CreatedAt: time.Now()},
+		{Nama: "CV. Teknologi Indah", Alamat: "Jl. Raya No. 88", Jurusan: "TKJ", CreatedAt: time.Now()},
+		{Nama: "PT. Sinergi Global", Alamat: "Jl. Merdeka No. 5", Jurusan: "RPL", CreatedAt: time.Now()},
+		{Nama: "PT. Inovasi Cerdas", Alamat: "Jl. Soekarno Hatta No. 10", Jurusan: "TKJ", CreatedAt: time.Now()},
+		{Nama: "CV. Digital Kreatif", Alamat: "Jl. Pahlawan No. 7", Jurusan: "RPL", CreatedAt: time.Now()},
 	}
 
 	// Insert data dummy
@@ -97,6 +101,62 @@ func SeedPegawai() {
 			Aktif:     false,
 			CreatedAt: time.Now(),
 		},
+		{
+			IdPegawai: 1004,
+			Nama:      "Alice Walker",
+			Email:     "alicewalker@example.com",
+			Password:  HashPassword("password123"),
+			Aktif:     true,
+			CreatedAt: time.Now(),
+		},
+		{
+			IdPegawai: 1005,
+			Nama:      "Bob Brown",
+			Email:     "bobbrown@example.com",
+			Password:  HashPassword("password123"),
+			Aktif:     true,
+			CreatedAt: time.Now(),
+		},
+		{
+			IdPegawai: 1006,
+			Nama:      "Charlie Davis",
+			Email:     "charliedavis@example.com",
+			Password:  HashPassword("password123"),
+			Aktif:     true,
+			CreatedAt: time.Now(),
+		},
+		{
+			IdPegawai: 1007,
+			Nama:      "Eve Adams",
+			Email:     "eveadams@example.com",
+			Password:  HashPassword("password123"),
+			Aktif:     false,
+			CreatedAt: time.Now(),
+		},
+		{
+			IdPegawai: 1008,
+			Nama:      "Grace Lee",
+			Email:     "gracelee@example.com",
+			Password:  HashPassword("password123"),
+			Aktif:     true,
+			CreatedAt: time.Now(),
+		},
+		{
+			IdPegawai: 1009,
+			Nama:      "Henry Miller",
+			Email:     "henrymiller@example.com",
+			Password:  HashPassword("password123"),
+			Aktif:     true,
+			CreatedAt: time.Now(),
+		},
+		{
+			IdPegawai: 1010,
+			Nama:      "Isabella Taylor",
+			Email:     "isabellataylor@example.com",
+			Password:  HashPassword("password123"),
+			Aktif:     false,
+			CreatedAt: time.Now(),
+		},
 	}
 
 	// Insert data dummy
@@ -134,18 +194,74 @@ func SeedKonfigurasiRoles() {
 	// Data dummy KonfigurasiRoles
 	konfigurasiRolesList := []Models.KonfigurasiRoles{
 		{
-			FKIdPegawai: pegawaiList[0].ID,
-			FKIdRole:    &roleList[0].ID,
+			FKIdPegawai: pegawaiList[0].ID, // John Doe
+			FKIdRole:    &roleList[0].ID,   // Pembimbing
 			CreatedAt:   time.Now(),
 		},
 		{
-			FKIdPegawai: pegawaiList[1].ID,
-			FKIdRole:    &roleList[1].ID,
+			FKIdPegawai: pegawaiList[0].ID, // John Doe
+			FKIdRole:    &roleList[1].ID,   // Fasilitator
 			CreatedAt:   time.Now(),
 		},
 		{
-			FKIdPegawai: pegawaiList[2].ID,
-			FKIdRole:    &roleList[0].ID,
+			FKIdPegawai: pegawaiList[1].ID, // Jane Smith
+			FKIdRole:    &roleList[1].ID,   // Fasilitator
+			CreatedAt:   time.Now(),
+		},
+		{
+			FKIdPegawai: pegawaiList[2].ID, // David Johnson
+			FKIdRole:    &roleList[0].ID,   // Pembimbing
+			CreatedAt:   time.Now(),
+		},
+		{
+			FKIdPegawai: pegawaiList[3].ID, // Alice Walker
+			FKIdRole:    &roleList[1].ID,   // Fasilitator
+			CreatedAt:   time.Now(),
+		},
+		{
+			FKIdPegawai: pegawaiList[4].ID, // Bob Brown
+			FKIdRole:    &roleList[0].ID,   // Pembimbing
+			CreatedAt:   time.Now(),
+		},
+		{
+			FKIdPegawai: pegawaiList[5].ID, // Charlie Davis
+			FKIdRole:    &roleList[1].ID,   // Fasilitator
+			CreatedAt:   time.Now(),
+		},
+		{
+			FKIdPegawai: pegawaiList[6].ID, // Eve Adams
+			FKIdRole:    &roleList[0].ID,   // Pembimbing
+			CreatedAt:   time.Now(),
+		},
+		{
+			FKIdPegawai: pegawaiList[6].ID, // Eve Adams
+			FKIdRole:    &roleList[1].ID,   // Fasilitator
+			CreatedAt:   time.Now(),
+		},
+		{
+			FKIdPegawai: pegawaiList[7].ID, // Grace Lee
+			FKIdRole:    &roleList[0].ID,   // Pembimbing
+			CreatedAt:   time.Now(),
+		},
+		{
+			FKIdPegawai: pegawaiList[8].ID, // Henry Miller
+			FKIdRole:    &roleList[1].ID,   // Fasilitator
+			CreatedAt:   time.Now(),
+		},
+		{
+			FKIdPegawai: pegawaiList[9].ID, // Isabella Taylor
+			FKIdRole:    &roleList[1].ID,   // Fasilitator
+			CreatedAt:   time.Now(),
+		},
+		// Dosen yang memiliki dua peran: Pembimbing dan Fasilitator
+		{
+			FKIdPegawai: pegawaiList[4].ID, // Bob Brown
+			FKIdRole:    &roleList[1].ID,   // Fasilitator
+			CreatedAt:   time.Now(),
+		},
+		{
+			FKIdPegawai: pegawaiList[5].ID, // Charlie Davis
+			FKIdRole:    &roleList[0].ID,   // Pembimbing
 			CreatedAt:   time.Now(),
 		},
 	}
@@ -194,8 +310,8 @@ func SeedDataSiswa() {
 			Aktif:                       true,
 			Email:                       "johndoe@example.com",
 			Password:                    "password123",
-			FKIdPembimbing:              pegawaiList[0].ID,
-			FKIdFasilitator:             pegawaiList[1].ID,
+			FKIdPembimbing:              pegawaiList[0].ID, // Pembimbing (John Doe)
+			FKIdFasilitator:             pegawaiList[1].ID, // Fasilitator (Jane Smith)
 			FKIdIndustri:                industriList[0].ID,
 			NilaiSoftskillIndustri:      85,
 			NilaiSoftskillFasilitator:   90,
@@ -216,8 +332,8 @@ func SeedDataSiswa() {
 			Aktif:                       true,
 			Email:                       "janesmith@example.com",
 			Password:                    "password456",
-			FKIdPembimbing:              pegawaiList[0].ID,
-			FKIdFasilitator:             pegawaiList[1].ID,
+			FKIdPembimbing:              pegawaiList[0].ID, // Pembimbing (John Doe)
+			FKIdFasilitator:             pegawaiList[1].ID, // Fasilitator (Jane Smith)
 			FKIdIndustri:                industriList[1].ID,
 			NilaiSoftskillIndustri:      80,
 			NilaiSoftskillFasilitator:   85,
@@ -238,8 +354,8 @@ func SeedDataSiswa() {
 			Aktif:                       true,
 			Email:                       "dariamsa@example.com",
 			Password:                    "password456",
-			FKIdPembimbing:              pegawaiList[2].ID,
-			FKIdFasilitator:             pegawaiList[1].ID,
+			FKIdPembimbing:              pegawaiList[2].ID, // Pembimbing (David Johnson)
+			FKIdFasilitator:             pegawaiList[1].ID, // Fasilitator (Jane Smith)
 			FKIdIndustri:                industriList[2].ID,
 			NilaiSoftskillIndustri:      80,
 			NilaiSoftskillFasilitator:   85,
@@ -247,6 +363,94 @@ func SeedDataSiswa() {
 			NilaiHardskillPembimbing:    86,
 			NilaiKemandirianFasilitator: 88,
 			NilaiPengujianPembimbing:    84,
+			CreatedAt:                   time.Now(),
+		},
+		{
+			NIS:                         "45678",
+			Nama:                        "Alice Brown",
+			Kelas:                       "12",
+			Jurusan:                     "TKJ",
+			Rombel:                      "A",
+			TanggalMasuk:                time.Now().AddDate(-1, 0, 0),
+			TanggalKeluar:               time.Now().AddDate(0, 6, 0),
+			Aktif:                       true,
+			Email:                       "alicebrown@example.com",
+			Password:                    "password789",
+			FKIdPembimbing:              pegawaiList[3].ID, // Pembimbing (Alice Walker)
+			FKIdFasilitator:             pegawaiList[4].ID, // Fasilitator (Bob Brown)
+			FKIdIndustri:                industriList[3].ID,
+			NilaiSoftskillIndustri:      82,
+			NilaiSoftskillFasilitator:   88,
+			NilaiHardskillIndustri:      85,
+			NilaiHardskillPembimbing:    90,
+			NilaiKemandirianFasilitator: 91,
+			NilaiPengujianPembimbing:    88,
+			CreatedAt:                   time.Now(),
+		},
+		{
+			NIS:                         "34567",
+			Nama:                        "Bob White",
+			Kelas:                       "11",
+			Jurusan:                     "RPL",
+			Rombel:                      "C",
+			TanggalMasuk:                time.Now().AddDate(-1, 0, 0),
+			TanggalKeluar:               time.Now().AddDate(0, 6, 0),
+			Aktif:                       true,
+			Email:                       "bobwhite@example.com",
+			Password:                    "password101",
+			FKIdPembimbing:              pegawaiList[5].ID, // Pembimbing (Charlie Davis)
+			FKIdFasilitator:             pegawaiList[6].ID, // Fasilitator (Eve Adams)
+			FKIdIndustri:                industriList[0].ID,
+			NilaiSoftskillIndustri:      80,
+			NilaiSoftskillFasilitator:   84,
+			NilaiHardskillIndustri:      90,
+			NilaiHardskillPembimbing:    93,
+			NilaiKemandirianFasilitator: 86,
+			NilaiPengujianPembimbing:    85,
+			CreatedAt:                   time.Now(),
+		},
+		{
+			NIS:                         "56789",
+			Nama:                        "Liam Green",
+			Kelas:                       "12",
+			Jurusan:                     "TKJ",
+			Rombel:                      "A",
+			TanggalMasuk:                time.Now().AddDate(-1, 0, 0),
+			TanggalKeluar:               time.Now().AddDate(0, 6, 0),
+			Aktif:                       true,
+			Email:                       "liamgreen@example.com",
+			Password:                    "password112",
+			FKIdPembimbing:              pegawaiList[6].ID, // Pembimbing (Eve Adams)
+			FKIdFasilitator:             pegawaiList[7].ID, // Fasilitator (Grace Lee)
+			FKIdIndustri:                industriList[1].ID,
+			NilaiSoftskillIndustri:      78,
+			NilaiSoftskillFasilitator:   85,
+			NilaiHardskillIndustri:      90,
+			NilaiHardskillPembimbing:    88,
+			NilaiKemandirianFasilitator: 90,
+			NilaiPengujianPembimbing:    86,
+			CreatedAt:                   time.Now(),
+		},
+		{
+			NIS:                         "98765",
+			Nama:                        "Sophia Black",
+			Kelas:                       "11",
+			Jurusan:                     "RPL",
+			Rombel:                      "C",
+			TanggalMasuk:                time.Now().AddDate(-1, 0, 0),
+			TanggalKeluar:               time.Now().AddDate(0, 6, 0),
+			Aktif:                       true,
+			Email:                       "sophiablack@example.com",
+			Password:                    "password130",
+			FKIdPembimbing:              pegawaiList[4].ID, // Pembimbing (Bob Brown)
+			FKIdFasilitator:             pegawaiList[5].ID, // Fasilitator (Charlie Davis)
+			FKIdIndustri:                industriList[2].ID,
+			NilaiSoftskillIndustri:      84,
+			NilaiSoftskillFasilitator:   90,
+			NilaiHardskillIndustri:      87,
+			NilaiHardskillPembimbing:    93,
+			NilaiKemandirianFasilitator: 92,
+			NilaiPengujianPembimbing:    89,
 			CreatedAt:                   time.Now(),
 		},
 	}

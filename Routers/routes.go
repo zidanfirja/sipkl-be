@@ -29,6 +29,8 @@ func SetupRouter() *gin.Engine {
 		v1.DELETE("/industri", Controllers.DeleteIndustri)
 		v1.PUT("/industri", Controllers.UpdateIndustri)
 
+		v1.GET("/pegawai", Controllers.GetAllPegawai)
+
 	}
 	return route
 }
