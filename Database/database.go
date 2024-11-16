@@ -46,7 +46,6 @@ func ConnetDB() {
 	var err error
 
 	// postgrest for prod
-
 	dsn := dbConfig.DBUrl + "?pgbouncer=true&connection_limit=1"
 
 	// dsn := "host=" + dbHost + " user=" + dbUsername + " password=" + dbPassword + " dbname=" + dbName + " port=" + dbPort + " sslmode=disable" + " pg_stmtcache.mode=describe"

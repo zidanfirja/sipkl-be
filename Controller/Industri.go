@@ -1,6 +1,7 @@
 package Controllers
 
 import (
+	"encoding/json"
 	"go-gin-mysql/Models"
 	"net/http"
 	"strconv"
@@ -45,26 +46,44 @@ func GetAllIndustri(c *gin.Context) {
 
 func CreateIndustri(c *gin.Context) {
 
-	var industri Models.Industri
+	var daftarIndustri []Models.Industri
 
-	err := c.ShouldBindJSON(&industri)
+	rawData, err := c.GetRawData()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "data yang dimuat gagal",
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "gagal membaca data",
 			"error":   err.Error(),
 		})
 		return
 	}
 
-	errCreate := Models.CreateIndustri(&industri)
-	if errCreate != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": errCreate.Error(),
-		})
+	// ini coba unmarshal data ke array (daftarIndustri)
+	if err := json.Unmarshal(rawData, &daftarIndustri); err != nil {
+		// jika gagal berarti data hanya satu
+		var industri Models.Industri
+		if err := json.Unmarshal(rawData, &industri); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "format data tidak valid",
+				"error":   err.Error(),
+			})
+			return
+		}
+		daftarIndustri = append(daftarIndustri, industri)
+	}
+
+	for _, industri := range daftarIndustri {
+
+		errCreate := Models.CreateIndustri(&industri)
+		if errCreate != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "gagal menambahkan data industri",
+				"error":   errCreate.Error(),
+			})
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "berhasil menambahkan ",
+		"message": "berhasil menambahkan industri",
 	})
 }
 

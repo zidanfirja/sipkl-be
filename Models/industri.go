@@ -26,6 +26,10 @@ type DeleteIndustriReq struct {
 	ID interface{} `json:"id" binding:"required"`
 }
 
+type MultipleIndustri struct {
+	Industri []Industri
+}
+
 func GetIdustri() ([]Industri, error) {
 
 	var industriModel []Industri

@@ -33,7 +33,11 @@ func SetupRouter() *gin.Engine {
 		v1.PUT("/industri", Controllers.UpdateIndustri)
 
 		v1.GET("/pegawai", Controllers.GetAllPegawai)
+		v1.DELETE("/pegawai", Controllers.DeletePegawai)
+		v1.PUT("/pegawai", Controllers.UpdatePegawai)
+
 		v1.POST("/pegawai", Controllers.CreatePegawai)
+		v1.POST("/pegawai/assign-role", Controllers.AssignRole)
 
 	}
 	return route
