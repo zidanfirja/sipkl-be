@@ -57,6 +57,7 @@ func ConnetDB() {
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true, // Nonaktifkan pluralisasi nama tabel
 		},
+		// PrepareStmt: false, // Nonaktifkan prepared statement cache (untuk seeding)
 	})
 	if err != nil {
 		log.Fatalf("Gagal terhubung ke database: %v", err)

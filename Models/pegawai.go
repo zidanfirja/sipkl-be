@@ -7,7 +7,7 @@ import (
 
 type Pegawai struct {
 	ID        int    `gorm:"type:int;primaryKey;autoIncrement" json:"id"`
-	IdPegawai int    `gorm:"type:varchar(100);not null" json:"id_pegawai"`
+	IdPegawai string `gorm:"type:varchar(100);not null" json:"id_pegawai"`
 	Nama      string `gorm:"type:varchar(255);not null" json:"nama"`
 	Email     string `gorm:"unique;type:varchar(100)" json:"email"`
 	Password  string `json:"password" gorm:"type:varchar(255)"`

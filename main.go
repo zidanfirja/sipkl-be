@@ -3,7 +3,6 @@ package main
 import (
 	"go-gin-mysql/Database"
 	"go-gin-mysql/Routers"
-	"go-gin-mysql/Seed"
 	"os"
 )
 
@@ -15,11 +14,11 @@ func main() {
 	// Database.Database.Migrator().DropTable(&Models.Role{}, &Models.Pegawai{}, &Models.KonfigurasiRoles{}, &Models.Industri{}, &Models.DataSiswa{})
 
 	// seed data
-	Seed.SeedRole()
-	Seed.SeedIndustri()
-	Seed.SeedPegawai()
-	Seed.SeedKonfigurasiRoles()
-	Seed.SeedDataSiswa()
+	// Seed.SeedRole()
+	// Seed.SeedIndustri()
+	// Seed.SeedPegawai()
+	// Seed.SeedKonfigurasiRoles()
+	// Seed.SeedDataSiswa()
 
 	port := os.Getenv("PORT")
 	if port == "" {

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 func SeedRole() {
@@ -24,7 +25,7 @@ func SeedRole() {
 		{Nama: "Fasilitator", Aktif: true},
 	}
 
-	if err := DB.Database.Create(&roles).Error; err != nil {
+	if err := DB.Database.Session(&gorm.Session{PrepareStmt: false}).Create(&roles).Error; err != nil {
 		log.Fatal("Gagal mengisi data dummy:", err)
 	}
 	fmt.Println("Data dummy berhasil ditambahkan")
@@ -52,7 +53,7 @@ func SeedIndustri() {
 	}
 
 	// Insert data dummy
-	if err := DB.Database.Create(&industriList).Error; err != nil {
+	if err := DB.Database.Session(&gorm.Session{PrepareStmt: false}).Create(&industriList).Error; err != nil {
 		log.Fatal("Gagal mengisi data Industri:", err)
 	}
 	fmt.Println("Data Industri berhasil ditambahkan")
@@ -78,7 +79,7 @@ func SeedPegawai() {
 	// Data dummy Pegawai
 	pegawaiList := []Models.Pegawai{
 		{
-			IdPegawai: 1001,
+			IdPegawai: "1001",
 			Nama:      "John Doe",
 			Email:     "johndoe@example.com",
 			Password:  HashPassword("password123"),
@@ -86,7 +87,7 @@ func SeedPegawai() {
 			CreatedAt: time.Now(),
 		},
 		{
-			IdPegawai: 1002,
+			IdPegawai: "1002",
 			Nama:      "Jane Smith",
 			Email:     "janesmith@example.com",
 			Password:  HashPassword("password123"),
@@ -94,7 +95,7 @@ func SeedPegawai() {
 			CreatedAt: time.Now(),
 		},
 		{
-			IdPegawai: 1003,
+			IdPegawai: "1003",
 			Nama:      "David Johnson",
 			Email:     "davidj@example.com",
 			Password:  HashPassword("password123"),
@@ -102,7 +103,7 @@ func SeedPegawai() {
 			CreatedAt: time.Now(),
 		},
 		{
-			IdPegawai: 1004,
+			IdPegawai: "1004",
 			Nama:      "Alice Walker",
 			Email:     "alicewalker@example.com",
 			Password:  HashPassword("password123"),
@@ -110,7 +111,7 @@ func SeedPegawai() {
 			CreatedAt: time.Now(),
 		},
 		{
-			IdPegawai: 1005,
+			IdPegawai: "1005",
 			Nama:      "Bob Brown",
 			Email:     "bobbrown@example.com",
 			Password:  HashPassword("password123"),
@@ -118,7 +119,7 @@ func SeedPegawai() {
 			CreatedAt: time.Now(),
 		},
 		{
-			IdPegawai: 1006,
+			IdPegawai: "1006",
 			Nama:      "Charlie Davis",
 			Email:     "charliedavis@example.com",
 			Password:  HashPassword("password123"),
@@ -126,7 +127,7 @@ func SeedPegawai() {
 			CreatedAt: time.Now(),
 		},
 		{
-			IdPegawai: 1007,
+			IdPegawai: "1007",
 			Nama:      "Eve Adams",
 			Email:     "eveadams@example.com",
 			Password:  HashPassword("password123"),
@@ -134,7 +135,7 @@ func SeedPegawai() {
 			CreatedAt: time.Now(),
 		},
 		{
-			IdPegawai: 1008,
+			IdPegawai: "1008",
 			Nama:      "Grace Lee",
 			Email:     "gracelee@example.com",
 			Password:  HashPassword("password123"),
@@ -142,7 +143,7 @@ func SeedPegawai() {
 			CreatedAt: time.Now(),
 		},
 		{
-			IdPegawai: 1009,
+			IdPegawai: "1009",
 			Nama:      "Henry Miller",
 			Email:     "henrymiller@example.com",
 			Password:  HashPassword("password123"),
@@ -150,7 +151,7 @@ func SeedPegawai() {
 			CreatedAt: time.Now(),
 		},
 		{
-			IdPegawai: 1010,
+			IdPegawai: "1010",
 			Nama:      "Isabella Taylor",
 			Email:     "isabellataylor@example.com",
 			Password:  HashPassword("password123"),
@@ -160,7 +161,7 @@ func SeedPegawai() {
 	}
 
 	// Insert data dummy
-	if err := DB.Database.Create(&pegawaiList).Error; err != nil {
+	if err := DB.Database.Session(&gorm.Session{PrepareStmt: false}).Create(&pegawaiList).Error; err != nil {
 		log.Fatal("Gagal mengisi data Pegawai:", err)
 	}
 	fmt.Println("Data Pegawai berhasil ditambahkan")
@@ -267,7 +268,7 @@ func SeedKonfigurasiRoles() {
 	}
 
 	// Insert data dummy
-	if err := DB.Database.Create(&konfigurasiRolesList).Error; err != nil {
+	if err := DB.Database.Session(&gorm.Session{PrepareStmt: false}).Create(&konfigurasiRolesList).Error; err != nil {
 		log.Fatal("Gagal mengisi data KonfigurasiRoles:", err)
 	}
 	fmt.Println("Data KonfigurasiRoles berhasil ditambahkan")
@@ -456,7 +457,7 @@ func SeedDataSiswa() {
 	}
 
 	// Insert data dummy
-	if err := DB.Database.Create(&dataSiswaList).Error; err != nil {
+	if err := DB.Database.Session(&gorm.Session{PrepareStmt: false}).Create(&dataSiswaList).Error; err != nil {
 		log.Fatal("Gagal mengisi data DataSiswa:", err)
 	}
 	fmt.Println("Data DataSiswa berhasil ditambahkan")
