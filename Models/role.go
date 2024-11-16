@@ -13,7 +13,7 @@ type Role struct {
 	Aktif bool   `json:"aktif" binding:"required"`
 
 	// ini untuk migrate db harus di un-comment
-	// KonfigurasiRoles []KonfigurasiRoles `gorm:"foreignKey:FKIdRole;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+	KonfigurasiRoles []KonfigurasiRoles `gorm:"foreignKey:FKIdRole;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
 
 	CreatedAt time.Time `json:"created_at" gorm:"type:timestamp"`
 }
