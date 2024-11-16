@@ -2,10 +2,9 @@ package Routers
 
 import (
 	Controllers "go-gin-mysql/Controller"
+	"go-gin-mysql/Middleware"
 	"net/http"
-	"time"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,20 +12,22 @@ func SetupRouter() *gin.Engine {
 
 	route := gin.Default()
 
+	route.Use(Middleware.CORSMiddleware())
+
 	route.GET("/", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
 			"massage": "halaman pertama",
 		})
 	})
 
-	route.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"https://sipkl.smkpunegerijabar.sch.id"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Content-Type", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
-	}))
+	// route.Use(cors.New(cors.Config{
+	// 	AllowOrigins:     []string{"https://sipkl.smkpunegerijabar.sch.id"},
+	// 	AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+	// 	AllowHeaders:     []string{"Content-Type", "Authorization"},
+	// 	ExposeHeaders:    []string{"Content-Length"},
+	// 	AllowCredentials: true,
+	// 	MaxAge:           12 * time.Hour,
+	// }))
 
 	v1 := route.Group("/sipkl/v1/data/hubin/")
 	{
