@@ -32,7 +32,7 @@ func LoadDBConfig() DBConfig {
 		Host:     os.Getenv("DB_HOST"),
 		Port:     os.Getenv("DB_PORT"),
 		DBName:   os.Getenv("DB_NAME"),
-		DBUrl:    os.Getenv("DATABASE_URL")
+		DBUrl:    os.Getenv("DATABASE_URL"),
 	}
 
 }
