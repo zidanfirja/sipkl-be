@@ -1,6 +1,10 @@
 package Models
 
-import "time"
+import (
+	"fmt"
+	DB "go-gin-mysql/Database"
+	"time"
+)
 
 type DataSiswa struct {
 	NIS     string `json:"id" gorm:"primaryKey;type:varchar(50)"`
@@ -34,4 +38,58 @@ type DataSiswa struct {
 	NilaiPengujianPembimbing    int `json:"nilai_pengujian_pembimbing"`
 
 	CreatedAt time.Time `json:"created_at" gorm:"type:timestamp"`
+}
+
+type RespDataPkl struct {
+	IDPerusahaan    int     `json:"id_perusahaan"`
+	NamaPerusahaan  string  `json:"nama_perusahaan"`
+	IDPembimbing    int     `json:"id_pembimbing"`
+	NamaPembimbing  string  `json:"nama_pembimbing"`
+	IDFasilitator   int     `json:"id_fasilitator"`
+	NamaFasilitator string  `json:"nama_fasilitator"`
+	DaftarSiswa     []Siswa `json:"daftar_siswa" gorm:"-"`
+}
+
+type Siswa struct {
+	NIS       string `json:"nis"`
+	NamaSiswa string `json:"nama_siswa"`
+	Jurusan   string `json:"jurusan"`
+	Rombel    string `json:"rombel"`
+}
+
+func GetDataPkl() ([]RespDataPkl, error) {
+	var rows []RespDataPkl
+	query := `SELECT i.id AS id_perusahaan, i.nama AS nama_perusahaan, p.id AS id_pembimbing, p.nama AS nama_pembimbing, f.id AS id_fasilitator, f.nama AS nama_fasilitator FROM data_siswa s LEFT JOIN industri i ON i.id = s.fk_id_industri LEFT JOIN pegawai p ON p.id = s.fk_id_pembimbing LEFT JOIN pegawai f ON f.id = s.fk_id_fasilitator GROUP BY i.id, p.id, f.id`
+
+	// Menjalankan query
+	result := DB.Database.Raw(query).Scan(&rows)
+	if result.Error != nil {
+		fmt.Println("Gagal mengambl data:", result.Error)
+		return nil, result.Error
+	}
+
+	for i := range rows {
+		dataSiswa, err := GetSiswaByIndustri(rows[i].IDPerusahaan)
+		if err != nil {
+			return nil, err
+		}
+		rows[i].DaftarSiswa = dataSiswa
+	}
+
+	return rows, nil
+}
+
+func GetSiswaByIndustri(id int) ([]Siswa, error) {
+	var siswa []Siswa
+	rows := DB.Database.Table("data_siswa").
+		Select("nis, nama AS nama_siswa, jurusan, rombel").
+		Where("fk_id_industri = ?", id).
+		Find(&siswa)
+
+	if rows.Error != nil {
+		fmt.Println("gagal mengambil data siswa by industri")
+		return nil, rows.Error
+	}
+	return siswa, nil
+
 }

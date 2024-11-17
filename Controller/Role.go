@@ -19,8 +19,20 @@ func GetAllRole(c *gin.Context) {
 		})
 		return
 	}
+
+	var response []Models.RespGetRoles
+	for _, item := range roles {
+		response = append(response, Models.RespGetRoles{
+			ID:        item.ID,
+			Nama:      item.Nama,
+			Aktif:     item.Aktif,
+			CreatedAt: item.CreatedAt,
+		})
+
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"data": roles,
+		"data": response,
 	})
 }
 
@@ -140,6 +152,7 @@ func UpdateRole(c *gin.Context) {
 		err := Models.UpdateSingleRole(int(ids), role.Payload)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
+				"id":    ids,
 				"error": err.Error(),
 			})
 			return

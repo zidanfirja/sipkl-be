@@ -27,6 +27,13 @@ type UpdateRoleReq struct {
 	Payload map[string]interface{} `json:"payload" binding:"required"`
 }
 
+type RespGetRoles struct {
+	ID        int       `gorm:"-" json:"id"`
+	Nama      string    `gorm:"type:varchar(50);not null" json:"nama" binding:"required"`
+	Aktif     bool      `json:"aktif" binding:"required"`
+	CreatedAt time.Time `json:"created_at" gorm:"type:timestamp"`
+}
+
 func GetRoles() ([]Role, error) {
 
 	var roleModel []Role
@@ -53,7 +60,7 @@ func DeleteRole(id int) error {
 	delete := DB.Database.Where("id = ?", id).Delete(&Role{})
 
 	if delete.RowsAffected == 0 {
-		return errors.New("role dengan id tersebut tidak ditemukan")
+		return errors.New("gagal delete, role dengan id tersebut tidak ditemukan")
 	}
 
 	if delete.Error != nil {
@@ -68,7 +75,7 @@ func UpdateSingleRole(id int, payload map[string]interface{}) error {
 	var role Role
 	result := DB.Database.First(&role, id)
 	if err := result.Error; err != nil {
-		return errors.New("role dengan ID tersebut tidak ditemukan")
+		return errors.New("gagal upadate, role dengan ID tersebut tidak ditemukan")
 	}
 
 	if result.RowsAffected == 0 {
