@@ -32,7 +32,7 @@ func SetupRouter() *gin.Engine {
 		hubin.DELETE("/industri", Controllers.DeleteIndustri)
 		hubin.PUT("/industri", Controllers.UpdateIndustri)
 
-		hubin.GET("/pegawai/i", Controllers.GetAllPegawai)
+		hubin.GET("/pegawai", Controllers.GetAllPegawai)
 		hubin.DELETE("/pegawai", Controllers.DeletePegawai)
 		hubin.PUT("/pegawai", Controllers.UpdatePegawai)
 		hubin.POST("/pegawai", Controllers.CreatePegawai)
