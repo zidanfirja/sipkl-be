@@ -38,7 +38,7 @@ func SetupRouter() *gin.Engine {
 		hubin.POST("/pegawai", Controllers.CreatePegawai)
 
 		hubin.GET("/pkl", Controllers.GetDataPkl)
-		// hubin.POST("/pkl", Controllers.GetDataPkl)
+		hubin.POST("/pkl", Controllers.AddDataPkl)
 
 		hubin.POST("/pegawai/role", Controllers.AssignRole)
 		hubin.DELETE("/pegawai/role", Controllers.DeleteRolePegawai)
