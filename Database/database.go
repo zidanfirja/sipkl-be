@@ -47,23 +47,22 @@ func ConnetDB() {
 	var err error
 
 	if dbConfig.DBEnv == "production" {
-		// PostgreSQL configuration for production
-		dsn := dbConfig.DBUrl + "?pgbouncer=true&connection_limit=2"
-
+		// postgrest for prod
+		dsn := dbConfig.DBUrl + "?pgbouncer=true&connection_limit=1"
+	
+		// dsn := "host=" + dbHost + " user=" + dbUsername + " password=" + dbPassword + " dbname=" + dbName + " port=" + dbPort + " sslmode=disable" + " pg_stmtcache.mode=describe"
 		Database, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 			NamingStrategy: schema.NamingStrategy{
 				SingularTable: true, // Nonaktifkan pluralisasi nama tabel
 			},
 			PrepareStmt: false, // Nonaktifkan prepared statement cache (untuk seeding)
 		})
-
 		if err != nil {
-			log.Fatalf("Gagal terhubung ke database PostgreSQL: %v", err)
+			log.Fatalf("Gagal terhubung ke database: %v", err)
 		}
-
 		log.Println("Berhasil terhubung ke database PostgreSQL")
-	} else {
-		// MySQL configuration for development
+	}else{
+		// mysql for development
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 			dbConfig.Username,
 			dbConfig.Password,
@@ -71,18 +70,16 @@ func ConnetDB() {
 			dbConfig.Port,
 			dbConfig.DBName,
 		)
-
+	
 		Database, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 			NamingStrategy: schema.NamingStrategy{
 				SingularTable: true,
 			},
 		})
-
-		if err != nil {
-			panic("Failed to connect to database!")
-		}
-
-		log.Println("Berhasil terhubung ke database MySQL")
+	}
+	
+	if err != nil {
+		panic("Failed to connect to database!")
 	}
 }
 
