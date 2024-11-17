@@ -93,3 +93,14 @@ func GetSiswaByIndustri(id int) ([]Siswa, error) {
 	return siswa, nil
 
 }
+
+func AddDataPkl(dataSiswa *DataSiswa) error {
+
+	dataSiswa.CreatedAt = time.Now()
+
+	create := DB.Database.Create(&dataSiswa)
+	if create.Error != nil {
+		return create.Error
+	}
+	return nil
+}

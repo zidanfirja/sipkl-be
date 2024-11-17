@@ -72,7 +72,6 @@ func CreateIndustri(c *gin.Context) {
 	}
 
 	for _, industri := range daftarIndustri {
-
 		errCreate := Models.CreateIndustri(&industri)
 		if errCreate != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{

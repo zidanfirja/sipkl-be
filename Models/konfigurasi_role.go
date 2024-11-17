@@ -1,6 +1,8 @@
 package Models
 
 import (
+	"errors"
+	"fmt"
 	DB "go-gin-mysql/Database"
 	"time"
 )
@@ -24,6 +26,10 @@ type ReqAssignRole struct {
 		IDRole int  `json:"id_role"`
 		Aktif  bool `json:"aktif"`
 	} `json:"payload"`
+}
+
+type IdRequest struct {
+	ID int `json:"id_konfigurasi_role"`
 }
 
 func GetRoleByIdPegawai(id int) ([]Role, error) {
@@ -54,6 +60,18 @@ func AddKonfigurasiRole(data *KonfigurasiRoles) error {
 
 }
 
-// func (KonfigurasiRoles) TableName() string {
-// 	return "konfigurasi_role"
-// }
+func DeleteRolePegawai(id int) error {
+	var konfigurasiRole KonfigurasiRoles
+	delete := DB.Database.Where("id = ?", id).Delete(&konfigurasiRole)
+	if delete.Error != nil {
+		return delete.Error
+	}
+
+	if delete.RowsAffected == 0 {
+		fmt.Println(delete.Error)
+		return errors.New("gagal menghapus jabatan tugas pegawai")
+	}
+
+	return nil
+
+}

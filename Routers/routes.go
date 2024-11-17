@@ -20,25 +20,28 @@ func SetupRouter() *gin.Engine {
 		})
 	})
 
-	v1 := route.Group("/sipkl/v1/data/hubin/")
+	hubin := route.Group("/sipkl/v1/data/hubin/")
 	{
-		v1.GET("/role", Controllers.GetAllRole)
-		v1.POST("/role", Controllers.CreateNewRole)
-		v1.DELETE("/role", Controllers.DeleteRole)
-		v1.PUT("/role", Controllers.UpdateRole)
+		hubin.GET("/role", Controllers.GetAllRole)
+		hubin.POST("/role", Controllers.CreateNewRole)
+		hubin.DELETE("/role", Controllers.DeleteRole)
+		hubin.PUT("/role", Controllers.UpdateRole)
 
-		v1.GET("/industri", Controllers.GetAllIndustri)
-		v1.POST("/industri", Controllers.CreateIndustri)
-		v1.DELETE("/industri", Controllers.DeleteIndustri)
-		v1.PUT("/industri", Controllers.UpdateIndustri)
+		hubin.GET("/industri", Controllers.GetAllIndustri)
+		hubin.POST("/industri", Controllers.CreateIndustri)
+		hubin.DELETE("/industri", Controllers.DeleteIndustri)
+		hubin.PUT("/industri", Controllers.UpdateIndustri)
 
-		v1.GET("/pegawai", Controllers.GetAllPegawai)
-		v1.DELETE("/pegawai", Controllers.DeletePegawai)
-		v1.PUT("/pegawai", Controllers.UpdatePegawai)
-		v1.POST("/pegawai", Controllers.CreatePegawai)
-		v1.POST("/pegawai/assign-role", Controllers.AssignRole)
+		hubin.GET("/pegawai/i", Controllers.GetAllPegawai)
+		hubin.DELETE("/pegawai", Controllers.DeletePegawai)
+		hubin.PUT("/pegawai", Controllers.UpdatePegawai)
+		hubin.POST("/pegawai", Controllers.CreatePegawai)
 
-		v1.GET("/pkl", Controllers.GetDataPkl)
+		hubin.GET("/pkl", Controllers.GetDataPkl)
+		// hubin.POST("/pkl", Controllers.GetDataPkl)
+
+		hubin.POST("/pegawai/role", Controllers.AssignRole)
+		hubin.DELETE("/pegawai/role", Controllers.DeleteRolePegawai)
 
 	}
 	return route

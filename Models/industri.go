@@ -10,7 +10,7 @@ type Industri struct {
 	ID      int    `json:"id" gorm:"primaryKey;type:int"`
 	Nama    string `json:"nama" gorm:"type:varchar(255)" binding:"required"`
 	Alamat  string `json:"alamat" binding:"required"`
-	Jurusan string `json:"jurusan"`
+	Jurusan string `json:"jurusan" gorm:"type:varchar(100)"`
 
 	DataSiswa []DataSiswa `gorm:"foreignKey:FKIdIndustri;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
 
