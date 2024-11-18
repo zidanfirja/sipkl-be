@@ -116,7 +116,7 @@ func UpdateAktifPegawai(id int, aktif bool) error {
 	}
 
 	if result.RowsAffected == 0 {
-		return errors.New("tidak ada pegawai yang diupdate")
+		return errors.New("tidak ada pegawai yang diupdate (aktif pegawai)")
 	}
 
 	return nil

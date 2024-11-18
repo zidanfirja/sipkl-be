@@ -21,7 +21,7 @@ type RespPegawaiGetAll struct {
 	Password  string `json:"password" gorm:"type:varchar(255)"`
 	Aktif     bool   `json:"aktif"`
 
-	DaftarRole []Models.Role `json:"daftar_role" gorm:"-"`
+	DaftarRole []Models.RespGetRoles `json:"daftar_role" `
 	// Pembimbing       []DataSiswa        `gorm:"foreignKey:FKIdPembimbing;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
 	// Fasilitator      []DataSiswa        `gorm:"foreignKey:FKIdFasilitator;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
 
@@ -267,9 +267,6 @@ func AssignRole(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"data": data,
-	})
 
 	// Mengakses field "id"
 	id, ok := data["id"].(float64) // id adalah angka (float64 setelah unmarshal)
@@ -292,9 +289,16 @@ func AssignRole(c *gin.Context) {
 		return
 	}
 
-	aktif, ok := payload["aktif"].(bool) // aktif adalah boolean
-	if !ok {
+	okPayloadAktif := payload["aktif"].(bool) // aktif adalah boolean
+	if !okPayloadAktif {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "aktif is required"})
+		return
+	}
+
+	if ok := Models.CekRolePegawai(int(id), int(idRole)); ok {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Pegawai dengan role tersebut sudah ada",
+		})
 		return
 	}
 
@@ -311,13 +315,8 @@ func AssignRole(c *gin.Context) {
 		})
 		return
 	}
-
-	errUpdateAktifPegawai := Models.UpdateAktifPegawai(int(id), aktif)
-	if errUpdateAktifPegawai != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": errUpdateAktifPegawai.Error(),
-		})
-		return
-	}
+	c.JSON(http.StatusOK, gin.H{
+		"message": "role berhasil di assign",
+	})
 
 }

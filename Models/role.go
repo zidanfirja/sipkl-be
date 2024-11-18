@@ -28,10 +28,11 @@ type UpdateRoleReq struct {
 }
 
 type RespGetRoles struct {
-	ID        int       `gorm:"-" json:"id"`
-	Nama      string    `gorm:"type:varchar(50);not null" json:"nama" binding:"required"`
-	Aktif     bool      `json:"aktif" binding:"required"`
-	CreatedAt time.Time `json:"created_at" gorm:"type:timestamp"`
+	IDKonRole int       `json:"id_konfigurasi_role" gorm:"column:id_konfigurasi_role"`
+	IDRole    int       `json:"id" gorm:"column:role_id"`
+	Nama      string    `json:"nama" gorm:"column:nama"`
+	Aktif     bool      `json:"aktif" gorm:"column:aktif"`
+	CreatedAt time.Time `json:"created_at" gorm:"column:created_at"`
 }
 
 func GetRoles() ([]Role, error) {

@@ -23,7 +23,7 @@ func GetAllRole(c *gin.Context) {
 	var response []Models.RespGetRoles
 	for _, item := range roles {
 		response = append(response, Models.RespGetRoles{
-			ID:        item.ID,
+			IDRole:    item.ID,
 			Nama:      item.Nama,
 			Aktif:     item.Aktif,
 			CreatedAt: item.CreatedAt,

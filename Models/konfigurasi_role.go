@@ -1,7 +1,6 @@
 package Models
 
 import (
-	"errors"
 	"fmt"
 	DB "go-gin-mysql/Database"
 	"time"
@@ -32,21 +31,23 @@ type IdRequest struct {
 	ID int `json:"id_konfigurasi_role"`
 }
 
-func GetRoleByIdPegawai(id int) ([]Role, error) {
+func GetRoleByIdPegawai(id int) ([]RespGetRoles, error) {
 
-	var roles []Role
+	var roles []RespGetRoles
 
 	rows := DB.Database.
-		Table("role").
-		Select("role.id, role.nama, role.aktif, role.created_at").
-		Joins("JOIN konfigurasi_roles ON konfigurasi_roles.fk_id_role = role.id").
+		Table("konfigurasi_roles").
+		Select("konfigurasi_roles.id AS id_konfigurasi_role, role.id AS role_id, role.nama, role.aktif, role.created_at").
+		Joins("JOIN role ON konfigurasi_roles.fk_id_role = role.id").
 		Joins("JOIN pegawai ON pegawai.id = konfigurasi_roles.fk_id_pegawai").
 		Where("pegawai.id = ?", id).
-		Find(&roles)
+		Scan(&roles)
 
 	if rows.Error != nil {
 		return nil, rows.Error
 	}
+
+	// log.Println(roles)
 	return roles, nil
 
 }
@@ -60,6 +61,11 @@ func AddKonfigurasiRole(data *KonfigurasiRoles) error {
 
 }
 
+func CekRolePegawai(id_pegawai int, id_role int) bool {
+	var data KonfigurasiRoles
+	return DB.Database.Where("fk_id_pegawai = ? AND fk_id_role = ?", id_pegawai, id_role).First(&data).Error == nil
+}
+
 func DeleteRolePegawai(id int) error {
 	var konfigurasiRole KonfigurasiRoles
 	delete := DB.Database.Where("id = ?", id).Delete(&konfigurasiRole)
@@ -69,7 +75,7 @@ func DeleteRolePegawai(id int) error {
 
 	if delete.RowsAffected == 0 {
 		fmt.Println(delete.Error)
-		return errors.New("gagal menghapus jabatan tugas pegawai")
+		return fmt.Errorf("tidak ada data konfigurasi role dengan id %d", id)
 	}
 
 	return nil
