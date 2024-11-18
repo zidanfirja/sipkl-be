@@ -3,11 +3,12 @@ package Models
 import (
 	"fmt"
 	DB "go-gin-mysql/Database"
+	"log"
 	"time"
 )
 
 type DataSiswa struct {
-	NIS     string `json:"id" gorm:"primaryKey;type:varchar(50)"`
+	NIS     string `json:"nis" gorm:"primaryKey;type:varchar(50)"`
 	Nama    string `json:"name" gorm:"type:varchar(255)"`
 	Kelas   string `json:"kelas" gorm:"type:varchar(255)"`
 	Jurusan string `json:"jurusan" gorm:"type:varchar(255)"`
@@ -41,7 +42,7 @@ type DataSiswa struct {
 }
 
 type ReqAddDataSiswa struct {
-	NIS      string `json:"id" gorm:"primaryKey;type:varchar(50)"`
+	NIS      string `json:"nis" gorm:"primaryKey;type:varchar(50)"`
 	Nama     string `json:"nama" gorm:"type:varchar(255)"`
 	Kelas    string `json:"kelas" gorm:"type:varchar(255)"`
 	Jurusan  string `json:"jurusan" gorm:"type:varchar(255)"`
@@ -70,10 +71,18 @@ type RespDataPkl struct {
 }
 
 type Siswa struct {
-	NIS       string `json:"nis"`
-	NamaSiswa string `json:"nama_siswa"`
-	Jurusan   string `json:"jurusan"`
-	Rombel    string `json:"rombel"`
+	NIS           string    `json:"nis"`
+	Nama          string    `json:"nama"`
+	Kelas         string    `json:"kelas"`
+	TanggalMasuk  time.Time `json:"tanggal_masuk"`
+	TanggalKeluar time.Time `json:"tanggal_keluar"`
+	Jurusan       string    `json:"jurusan"`
+	Rombel        string    `json:"rombel"`
+}
+
+type ReqUpdateTanggal struct {
+	NIS     interface{}            `json:"nis" binding:"required"`
+	Payload map[string]interface{} `json:"payload" binding:"required"`
 }
 
 func GetDataPkl() ([]RespDataPkl, error) {
@@ -100,8 +109,9 @@ func GetDataPkl() ([]RespDataPkl, error) {
 
 func GetSiswaByIndustri(id int) ([]Siswa, error) {
 	var siswa []Siswa
+
 	rows := DB.Database.Table("data_siswa").
-		Select("nis, nama AS nama_siswa, jurusan, rombel").
+		Select("nis,nama,kelas,tanggal_masuk,tanggal_keluar,jurusan,rombel").
 		Where("fk_id_industri = ?", id).
 		Find(&siswa)
 
@@ -125,5 +135,44 @@ func AddDataPkl(dataSiswa *DataSiswa) error {
 	if create.Error != nil {
 		return create.Error
 	}
+	return nil
+}
+
+func UpdateTanggalMasuk(nis []string, tanggal_masuk time.Time) error {
+
+	log.Println(nis)
+
+	payload := map[string]interface{}{
+		"tanggal_masuk": tanggal_masuk,
+	}
+
+	// dengan IN
+	result := DB.Database.Model(&DataSiswa{}).Where("nis IN ?", nis).Updates(payload)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	// if result.RowsAffected == 0 {
+	// 	return errors.New("tidak ada role yang diupdate")
+	// }
+
+	return nil
+}
+
+func UpdateTanggalKeluar(nis []string, tanggal_keluar time.Time) error {
+	payload := map[string]interface{}{
+		"tanggal_keluar": tanggal_keluar,
+	}
+
+	// dengan IN
+	result := DB.Database.Model(&DataSiswa{}).Where("nis IN ?", nis).Updates(payload)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	// if result.RowsAffected == 0 {
+	// 	return errors.New("tidak ada role yang diupdate")
+	// }
+
 	return nil
 }
