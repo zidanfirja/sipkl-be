@@ -1,6 +1,7 @@
 package Controllers
 
 import (
+	"encoding/json"
 	"go-gin-mysql/Models"
 	"net/http"
 	"time"
@@ -25,105 +26,175 @@ func GetDataPkl(c *gin.Context) {
 }
 
 // untuk handle inputan tanggal string menjadi time.time
-func handleZeroTime(tanggal string) (*time.Time, error) {
-	layout := "2006-01-02"
-	dataTanggal, errParse := time.Parse(layout, tanggal)
-	if errParse != nil {
-		return nil, errParse
+func handleZeroTime(dateString string) (*time.Time, error) {
+	// Jika string kosong, kembalikan nil
+	if dateString == "" {
+		return nil, nil
 	}
-	return &dataTanggal, errParse
 
+	// Tentukan layout sesuai dengan format input (yyyy-mm-dd)
+	layout := "2006-01-02"
+	// Parsing string ke time.Time
+	parsedTime, err := time.Parse(layout, dateString)
+	if err != nil {
+		return nil, err
+	}
+	return &parsedTime, nil
 }
 
-func AddDataPkl(c *gin.Context) {
-	var reqDataSiswa Models.ReqAddDataSiswa
+func NewDataPkl(c *gin.Context) {
+	var data interface{}
+	var siswaList []Models.DataSiswa
+	var siswa Models.ReqAddDataSiswa
 	var dataSiswa Models.DataSiswa
 
-	if err := c.ShouldBindJSON(&reqDataSiswa); err != nil {
+	if err := c.ShouldBindJSON(&data); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "input data yang valid",
-			"error":   err.Error(),
+			"error": err.Error(),
 		})
 		return
 	}
 
-	// layout := "2006-01-02"
+	switch dataPkl := data.(type) {
+	case []interface{}:
 
-	// parse data tanggal masuk dari inputan string bisa masuk ke model lalu ke db
-	// if reqDataSiswa.TanggalMasuk == "" {
-	// 	dataSiswa.TanggalMasuk = nil
+		for _, item := range dataPkl {
+			// Convert setiap item ke JSON dan bind ke struct
+			itemBytes, _ := json.Marshal(item)
 
-	// } else {
+			if err := json.Unmarshal(itemBytes, &siswa); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data in array"})
+				return
+			}
 
-	// 	parsedTanggalMasuk, errParseMasuk := time.Parse(layout, reqDataSiswa.TanggalMasuk)
-	// 	if errParseMasuk != nil {
-	// 		c.JSON(http.StatusInternalServerError, gin.H{
-	// 			"error": "masukan format data tanggal masuk yang benar",
-	// 		})
-	// 	}
-	// }
-	// tanggal, errTanggalMasuk := handleZeroTime(reqDataSiswa.TanggalMasuk)
-	//
-	dataSiswa.TanggalMasuk, _ = handleZeroTime(reqDataSiswa.TanggalMasuk)
+			tglMasuk, _ := handleZeroTime(siswa.TanggalMasuk)
+			dataSiswa.TanggalMasuk = tglMasuk
 
-	// _, errTanggalKeluar := handleZeroTime(reqDataSiswa.TanggalKeluar)
-	// if errTanggalKeluar != nil {
-	// 	c.JSON(http.StatusBadRequest, gin.H{
-	// 		"message": "input data tidak valid",
-	// 	})
-	// 	return
-	// }
-	dataSiswa.TanggalMasuk, _ = handleZeroTime(reqDataSiswa.TanggalMasuk)
+			tglKeluar, _ := handleZeroTime(siswa.TanggalKeluar)
+			dataSiswa.TanggalKeluar = tglKeluar
 
-	// dataSiswa.TanggalKeluar = handleZeroTime(reqDataSiswa.TanggalKeluar)
+			dataSiswa.NIS = siswa.NIS
+			dataSiswa.Nama = siswa.Nama
+			dataSiswa.Kelas = siswa.Kelas
+			dataSiswa.Jurusan = siswa.Jurusan
+			dataSiswa.Rombel = siswa.Rombel
+			dataSiswa.FKIdFasilitator = siswa.FKIdFasilitator
+			dataSiswa.FKIdIndustri = siswa.FKIdIndustri
+			dataSiswa.FKIdPembimbing = siswa.FKIdPembimbing
+			dataSiswa.Aktif = true
+			created_at := time.Now()
+			dataSiswa.CreatedAt = created_at
 
-	// // parse data tanggal masuk dari inputan string bisa masuk ke model lalu ke db
-	// if reqDataSiswa.TanggalKeluar == "" {
+			siswaList = append(siswaList, dataSiswa)
+		}
+		// Process the list of students
+		err := Models.AddMultipleDataPkl(&siswaList)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Gagal menginput data",
+				"error":   err.Error(),
+			})
+			return
 
-	// 	dataSiswa.TanggalKeluar = nil
-
-	// } else {
-	// 	parsedTanggalKeluar, errParseKeluar := time.Parse(layout, reqDataSiswa.TanggalKeluar)
-	// 	if errParseKeluar != nil {
-	// 		c.JSON(http.StatusInternalServerError, gin.H{
-	// 			"error": "masukan format data tanggal masuk yang benar",
-	// 		})
-	// 	}
-
-	// }
-
-	dataSiswa.NIS = reqDataSiswa.NIS
-	dataSiswa.Nama = reqDataSiswa.Nama
-	dataSiswa.Kelas = reqDataSiswa.Kelas
-	dataSiswa.Jurusan = reqDataSiswa.Jurusan
-	dataSiswa.Rombel = reqDataSiswa.Rombel
-	dataSiswa.FKIdFasilitator = reqDataSiswa.FKIdFasilitator
-	dataSiswa.FKIdIndustri = reqDataSiswa.FKIdIndustri
-	dataSiswa.FKIdPembimbing = reqDataSiswa.FKIdPembimbing
-	dataSiswa.Aktif = true
-	created_at := time.Now()
-	dataSiswa.CreatedAt = created_at
-
-	// c.JSON(http.StatusInternalServerError, gin.H{
-	// 	"data": dataSiswa,
-	// })
-	// return
-
-	err := Models.AddDataPkl(&dataSiswa)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Gagal menginput data",
-			"error":   err.Error(),
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Berhasil input data",
 		})
 		return
 
-	}
+	case map[string]interface{}:
+		// Handle a single object
+		itemBytes, _ := json.Marshal(dataPkl)
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "input data pkl berhasil",
-	})
+		if err := json.Unmarshal(itemBytes, &siswa); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Invalid single object data",
+			})
+			return
+		}
+
+		tglMasuk, _ := handleZeroTime(siswa.TanggalMasuk)
+		dataSiswa.TanggalMasuk = tglMasuk
+
+		tglKeluar, _ := handleZeroTime(siswa.TanggalKeluar)
+		dataSiswa.TanggalKeluar = tglKeluar
+
+		dataSiswa.NIS = siswa.NIS
+		dataSiswa.Nama = siswa.Nama
+		dataSiswa.Kelas = siswa.Kelas
+		dataSiswa.Jurusan = siswa.Jurusan
+		dataSiswa.Rombel = siswa.Rombel
+		dataSiswa.FKIdFasilitator = siswa.FKIdFasilitator
+		dataSiswa.FKIdIndustri = siswa.FKIdIndustri
+		dataSiswa.FKIdPembimbing = siswa.FKIdPembimbing
+		dataSiswa.Aktif = true
+		created_at := time.Now()
+		dataSiswa.CreatedAt = created_at
+
+		// proses singele data
+		err := Models.AddDataPkl(&dataSiswa)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": "Gagal menginput data",
+				"error":   err.Error(),
+			})
+			return
+
+		}
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Berhasil input data",
+		})
+		return
+
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data format"})
+		return
+	}
 
 }
+
+// func AddDataPkl(c *gin.Context) {
+// 	var reqDataSiswa Models.ReqAddDataSiswa
+// 	var dataSiswa Models.DataSiswa
+
+// 	if err := c.ShouldBindJSON(&reqDataSiswa); err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{
+// 			"message": "input data yang valid",
+// 			"error":   err.Error(),
+// 		})
+// 		return
+// 	}
+
+// 	dataSiswa.TanggalMasuk, _ = handleZeroTime(reqDataSiswa.TanggalMasuk)
+// 	dataSiswa.TanggalMasuk, _ = handleZeroTime(reqDataSiswa.TanggalMasuk)
+
+// 	dataSiswa.NIS = reqDataSiswa.NIS
+// 	dataSiswa.Nama = reqDataSiswa.Nama
+// 	dataSiswa.Kelas = reqDataSiswa.Kelas
+// 	dataSiswa.Jurusan = reqDataSiswa.Jurusan
+// 	dataSiswa.Rombel = reqDataSiswa.Rombel
+// 	dataSiswa.FKIdFasilitator = reqDataSiswa.FKIdFasilitator
+// 	dataSiswa.FKIdIndustri = reqDataSiswa.FKIdIndustri
+// 	dataSiswa.FKIdPembimbing = reqDataSiswa.FKIdPembimbing
+// 	dataSiswa.Aktif = true
+// 	created_at := time.Now()
+// 	dataSiswa.CreatedAt = created_at
+
+// 	err := Models.AddDataPkl(&dataSiswa)
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{
+// 			"message": "Gagal menginput data",
+// 			"error":   err.Error(),
+// 		})
+// 		return
+
+// 	}
+
+// 	c.JSON(http.StatusOK, gin.H{
+// 		"message": "input data pkl berhasil",
+// 	})
+
+// }
 
 func UpdateTanggalMasuk(c *gin.Context) {
 	var dataTanggalMasuk Models.ReqUpdateTanggal
@@ -187,10 +258,6 @@ func UpdateTanggalMasuk(c *gin.Context) {
 				return
 			}
 		}
-		// c.JSON(http.StatusBadRequest, gin.H{
-		// 	"message": daftarNis,
-		// })
-		// return
 
 		err := Models.UpdateTanggalMasuk(daftarNis, *tanggalTime)
 		if err != nil {

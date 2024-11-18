@@ -125,11 +125,13 @@ func GetSiswaByIndustri(id int) ([]Siswa, error) {
 
 func AddDataPkl(dataSiswa *DataSiswa) error {
 
-	// if dataSiswa.TanggalMasuk.IsZero() {
-	// 	dataSiswa.TanggalMasuk = nil
-	// }
-
-	dataSiswa.CreatedAt = time.Now()
+	create := DB.Database.Create(&dataSiswa)
+	if create.Error != nil {
+		return create.Error
+	}
+	return nil
+}
+func AddMultipleDataPkl(dataSiswa *[]DataSiswa) error {
 
 	create := DB.Database.Create(&dataSiswa)
 	if create.Error != nil {
