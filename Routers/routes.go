@@ -39,6 +39,7 @@ func SetupRouter() *gin.Engine {
 
 		hubin.GET("/pkl", Controllers.GetDataPkl)
 		hubin.POST("/pkl", Controllers.NewDataPkl)
+		hubin.PUT("/pkl", Controllers.UpdatePetugasPkl)
 		hubin.PUT("/pkl/tanggal_masuk", Controllers.UpdateTanggalMasuk)
 		hubin.PUT("/pkl/tanggal_keluar", Controllers.UpdateTanggalKeluar)
 

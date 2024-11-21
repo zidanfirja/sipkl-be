@@ -3,7 +3,9 @@ package Controllers
 import (
 	"encoding/json"
 	"go-gin-mysql/Models"
+	"log"
 	"net/http"
+	"reflect"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -197,7 +199,7 @@ func NewDataPkl(c *gin.Context) {
 // }
 
 func UpdateTanggalMasuk(c *gin.Context) {
-	var dataTanggalMasuk Models.ReqUpdateTanggal
+	var dataTanggalMasuk Models.ReqUpdateDataPkl
 
 	errBindJson := c.ShouldBindJSON(&dataTanggalMasuk)
 	if errBindJson != nil {
@@ -277,7 +279,7 @@ func UpdateTanggalMasuk(c *gin.Context) {
 }
 
 func UpdateTanggalKeluar(c *gin.Context) {
-	var dataTanggalKeluar Models.ReqUpdateTanggal
+	var dataTanggalKeluar Models.ReqUpdateDataPkl
 
 	errBindJson := c.ShouldBindJSON(&dataTanggalKeluar)
 	if errBindJson != nil {
@@ -355,5 +357,139 @@ func UpdateTanggalKeluar(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"massage": "berhasil update data tanggal keluar",
 	})
+
+}
+
+func UpdatePetugasPkl(c *gin.Context) {
+	var data Models.ReqUpdateDataPkl
+
+	errBindJson := c.ShouldBindJSON(&data)
+	if errBindJson != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": errBindJson.Error(),
+		})
+		return
+	}
+
+	// ini unutk mengatur NIS nya
+	var listNis []string
+	switch dataNis := data.NIS.(type) {
+	case string:
+		listNis = append(listNis, dataNis)
+	case []interface{}:
+		for _, item := range dataNis {
+			if nis, ok := item.(string); ok {
+				listNis = append(listNis, nis)
+			} else {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"message": "data nis invalid",
+				})
+			}
+
+		}
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "NIS harus string, atau array string",
+		})
+		return
+	}
+
+	var listUpdatePegawai []Models.UpdatePetugas
+
+	for _, nis := range listNis {
+		fkIdPembimbing, ok := data.Payload["fk_id_pembimbing"].(float64)
+		log.Println(reflect.TypeOf(fkIdPembimbing), fkIdPembimbing)
+		if !ok {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "format id pembimbing tidak valid",
+			})
+			return
+		}
+		fkIdFasilitator, ok := data.Payload["fk_id_fasilitator"].(float64)
+		if !ok {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "format id fasilitator  tidak valid",
+			})
+			return
+		}
+		fkIdIndustri, ok := data.Payload["fk_id_industri"].(float64)
+		if !ok {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "format id industri  tidak valid",
+			})
+			return
+		}
+		aktif, ok := data.Payload["aktif"].(bool)
+		if !ok {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "format aktif  tidak valid",
+			})
+			return
+		}
+
+		updatePetugas := Models.UpdatePetugas{
+			NIS:             nis,
+			FKIdPembimbing:  int(fkIdPembimbing),
+			FKIdFasilitator: int(fkIdFasilitator),
+			FKIdIndustri:    int(fkIdIndustri),
+			Aktif:           aktif,
+		}
+
+		listUpdatePegawai = append(listUpdatePegawai, updatePetugas)
+	}
+
+	err := Models.UpdatePengurusPkl(&listUpdatePegawai)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   err,
+			"message": "gagal update data petugas pkl",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "berhasil update data",
+	})
+
+	// Akses data NIS
+	// nisList, ok := data.NIS.([]interface{})
+	// if !ok {
+	// 	c.JSON(http.StatusBadRequest, gin.H{
+	// 		"error": "Invalid format for NIS",
+	// 	})
+	// 	return
+	// }
+
+	// Loop melalui setiap elemen di NIS jika memang berbentuk array
+	// var dataPetugas Models.UpdatePetugas
+	// var daftarDataPetugas []Models.UpdatePetugas
+
+	// fkIdPembimbing, ok := data.Payload["fk_id_pembimbing"].(int) // JSON numbers are float64 in Go
+	// fkIdFasilitator, ok2 := data.Payload["fk_id_fasilitator"].(int)
+	// fkIdIndustri, ok3 := data.Payload["fk_id_industri"].(int)
+	// aktif, ok4 := data.Payload["aktif"].(bool)
+
+	// if !ok || !ok2 || !ok3 || !ok4 {
+	// 	c.JSON(http.StatusBadRequest, gin.H{
+	// 		"error": "Invalid payload format",
+	// 	})
+	// 	return
+	// }
+
+	// dataPetugas.FKIdFasilitator = fkIdFasilitator
+	// dataPetugas.FKIdIndustri = fkIdIndustri
+	// dataPetugas.FKIdPembimbing = fkIdPembimbing
+	// dataPetugas.Aktif = aktif
+
+	// for _, nis := range nisList {
+
+	// 	nisStr, ok := nis.(string)
+	// 	if ok {
+	// 		//DISINI APPEND
+	// 		dataPetugas.NIS = nisStr
+	// 		daftarDataPetugas = append(daftarDataPetugas, dataPetugas)
+
+	// 	}
+	// }
 
 }

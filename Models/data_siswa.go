@@ -4,6 +4,7 @@ import (
 	"fmt"
 	DB "go-gin-mysql/Database"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -80,9 +81,17 @@ type Siswa struct {
 	Rombel        string    `json:"rombel"`
 }
 
-type ReqUpdateTanggal struct {
+type ReqUpdateDataPkl struct {
 	NIS     interface{}            `json:"nis" binding:"required"`
 	Payload map[string]interface{} `json:"payload" binding:"required"`
+}
+
+type UpdatePetugas struct {
+	NIS             string `json:"nis"`
+	FKIdPembimbing  int    `json:"fk_id_pembimbing"`
+	FKIdFasilitator int    `json:"fk_id_fasilitator"`
+	FKIdIndustri    int    `json:"fk_id_industri" gorm:"type:int;index"`
+	Aktif           bool   `json:"aktif"`
 }
 
 func GetDataPkl() ([]RespDataPkl, error) {
@@ -178,3 +187,76 @@ func UpdateTanggalKeluar(nis []string, tanggal_keluar time.Time) error {
 
 	return nil
 }
+
+func UpdatePengurusPkl(data *[]UpdatePetugas) error {
+
+	var nisList []string
+	var caseFkPembimbing, caseFkFasilitator, caseFkIndustri, caseAktif string
+
+	for _, petugas := range *data {
+		nisList = append(nisList, fmt.Sprintf("'%s'", petugas.NIS))
+		caseFkPembimbing += fmt.Sprintf("WHEN '%s' THEN %d ", petugas.NIS, petugas.FKIdPembimbing)
+		caseFkFasilitator += fmt.Sprintf("WHEN '%s' THEN %d ", petugas.NIS, petugas.FKIdFasilitator)
+		caseFkIndustri += fmt.Sprintf("WHEN '%s' THEN %d ", petugas.NIS, petugas.FKIdIndustri)
+		caseAktif += fmt.Sprintf("WHEN '%s' THEN %t ", petugas.NIS, petugas.Aktif)
+	}
+
+	query := fmt.Sprintf(`
+	UPDATE data_siswa
+	SET 
+		fk_id_pembimbing = CASE nis %s END,
+		fk_id_fasilitator = CASE nis %s END,
+		fk_id_industri = CASE nis %s END,
+		aktif = CASE nis %s END
+	WHERE nis IN (%s);
+`, caseFkPembimbing, caseFkFasilitator, caseFkIndustri, caseAktif, strings.Join(nisList, ", "))
+
+	// Eksekusi query sekali
+	if err := DB.Database.Exec(query).Error; err != nil {
+		// DB.Database.Rollback() // Rollback jika ada error
+		return err
+	}
+	return nil
+
+	// Commit transaksi
+	// if err := DB.Database.Commit().Error; err != nil {
+	// 	return errors.New("erro di sini")
+	// }
+
+	// return nil
+
+	// Menyusun query batch update
+	// query := "UPDATE data_siswa SET fk_id_pembimbing = ?, fk_id_fasilitator = ?, fk_id_industri = ?, aktif = ? WHERE nis = ?"
+
+	// for _, petugas := range *data {
+	// 	if err := DB.Database.Exec(query, petugas.FKIdPembimbing, petugas.FKIdFasilitator, petugas.FKIdIndustri, petugas.Aktif, petugas.NIS).Error; err != nil {
+	// DB.Database.Rollback() // Rollback jika ada error
+	// 		return err
+	// 	}
+	// }
+	// Commit transaksi setelah batch update
+	// if err := DB.Database.Commit().Error; err != nil {
+	// 	return err
+	// }
+	// return nil
+
+}
+
+// UPDATE update_petugas SET
+// 	tfk_id_pembimbing = CASE nis
+// 		WHEN '11ahmad12345' THEN 2
+// 		WHEN '12rah67890' THEN 2
+// 		WHEN '13SDSJI' THEN 2  END,
+// 	tfk_id_fasilitator = CASE nis
+// 		WHEN '11ahmad12345' THEN 2
+// 		WHEN '12rah67890' THEN 2
+// 		WHEN '13SDSJI' THEN 2  END,
+// 	tfk_id_industri = CASE nis
+// 		WHEN '11ahmad12345' THEN 2
+// 		WHEN '12rah67890' THEN 2
+// 		WHEN '13SDSJI' THEN 2  END,
+// 	taktif = CASE nis
+// 	WHEN '11ahmad12345' THEN true
+// 	WHEN '12rah67890' THEN true
+// 	WHEN '13SDSJI' THEN true  END
+// 	WHERE nis IN ('11ahmad12345', '12rah67890', '13SDSJI');
