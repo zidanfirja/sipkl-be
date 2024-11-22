@@ -42,6 +42,7 @@ func SetupRouter() *gin.Engine {
 		hubin.PUT("/pkl", Controllers.UpdatePetugasPkl)
 		hubin.PUT("/pkl/tanggal_masuk", Controllers.UpdateTanggalMasuk)
 		hubin.PUT("/pkl/tanggal_keluar", Controllers.UpdateTanggalKeluar)
+		hubin.DELETE("/pkl", Controllers.DeleteDataSiswaPkl)
 
 		hubin.POST("/pegawai/role", Controllers.AssignRole)
 		hubin.DELETE("/pegawai/role", Controllers.DeleteRolePegawai)

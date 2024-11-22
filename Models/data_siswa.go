@@ -94,6 +94,14 @@ type UpdatePetugas struct {
 	Aktif           bool   `json:"aktif"`
 }
 
+type ReqDataNis struct {
+	NIS interface{} `json:"nis"`
+}
+
+type DataNis struct {
+	NIS string `json:"nis"`
+}
+
 func GetDataPkl() ([]RespDataPkl, error) {
 	var rows []RespDataPkl
 	query := `SELECT i.id AS id_perusahaan, i.nama AS nama_perusahaan, p.id AS id_pembimbing, p.nama AS nama_pembimbing, f.id AS id_fasilitator, f.nama AS nama_fasilitator FROM data_siswa s LEFT JOIN industri i ON i.id = s.fk_id_industri LEFT JOIN pegawai p ON p.id = s.fk_id_pembimbing LEFT JOIN pegawai f ON f.id = s.fk_id_fasilitator GROUP BY i.id, p.id, f.id`
@@ -242,21 +250,20 @@ func UpdatePengurusPkl(data *[]UpdatePetugas) error {
 
 }
 
-// UPDATE update_petugas SET
-// 	tfk_id_pembimbing = CASE nis
-// 		WHEN '11ahmad12345' THEN 2
-// 		WHEN '12rah67890' THEN 2
-// 		WHEN '13SDSJI' THEN 2  END,
-// 	tfk_id_fasilitator = CASE nis
-// 		WHEN '11ahmad12345' THEN 2
-// 		WHEN '12rah67890' THEN 2
-// 		WHEN '13SDSJI' THEN 2  END,
-// 	tfk_id_industri = CASE nis
-// 		WHEN '11ahmad12345' THEN 2
-// 		WHEN '12rah67890' THEN 2
-// 		WHEN '13SDSJI' THEN 2  END,
-// 	taktif = CASE nis
-// 	WHEN '11ahmad12345' THEN true
-// 	WHEN '12rah67890' THEN true
-// 	WHEN '13SDSJI' THEN true  END
-// 	WHERE nis IN ('11ahmad12345', '12rah67890', '13SDSJI');
+func DeleteSiswaPkl(data *[]DataNis) error {
+
+	var listNis []string
+	for _, nis := range *data {
+		listNis = append(listNis, fmt.Sprintf("'%s'", nis.NIS))
+	}
+
+	nis := strings.Join(listNis, ", ")
+	query := fmt.Sprintf("DELETE FROM data_siswa WHERE nis IN (%s)", nis)
+
+	if err := DB.Database.Exec(query).Error; err != nil {
+
+		return err
+	}
+	return nil
+
+}
