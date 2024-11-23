@@ -48,5 +48,12 @@ func SetupRouter() *gin.Engine {
 		hubin.DELETE("/pegawai/role", Controllers.DeleteRolePegawai)
 
 	}
+
+	nilai := route.Group("/sipkl/v1/data/nilai")
+
+	{
+		nilai.GET("/industri-pembimbing/:id_pembimbing", Controllers.GetListIndustriPembimbing)
+		nilai.GET("/industri-fasilitator/:id_fasilitator", Controllers.GetListIndustriFasilitator)
+	}
 	return route
 }
