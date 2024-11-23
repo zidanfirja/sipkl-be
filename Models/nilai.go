@@ -66,7 +66,7 @@ type ReqUpdateNilaiPembimbing struct {
 
 type ReqUpdateNilaiFasilitator struct {
 	NIS                         string  `json:"nis"`
-	NilaiSoftskillFasilitator   float64 `json:"nilai_softskilll_fasilitator"`
+	NilaiSoftskillFasilitator   float64 `json:"nilai_softskill_fasilitator"`
 	NilaiKemandirianFasilitator float64 `json:"nilai_kemandirian_fasilitator"`
 }
 
