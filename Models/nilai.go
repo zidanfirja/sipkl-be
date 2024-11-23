@@ -9,7 +9,8 @@ type IndustriPembimbingFasil struct {
 	ID   int    `json:"id"`
 	Nama string `json:"nama"`
 }
-type NilaiSiswa struct {
+
+type NilaiSiswaPklPembimbing struct {
 	NIS                      string `json:"nis"`
 	Nama                     string `json:"nama"`
 	Kelas                    string `json:"kelas"`
@@ -19,6 +20,16 @@ type NilaiSiswa struct {
 	NilaiHardskillIndustri   int    `json:"nilai_hardskill_industri"`
 	NilaiHardskillPembimbing int    `json:"nilai_hardskill_pembimbing"`
 	NilaiPengujianPembimbing int    `json:"nilai_pengujian_pembimbing"`
+}
+
+type NilaiSiswaPklFasilitator struct {
+	NIS                         string `json:"nis"`
+	Nama                        string `json:"nama"`
+	Kelas                       string `json:"kelas"`
+	Jurusan                     string `json:"jurusan"`
+	Rombel                      string `json:"rombel"`
+	NilaiSoftskillFasilitator   int    `json:"nilai_softskill_fasilitator"`
+	NilaiKemandirianFasilitator int    `json:"nilai_kemandirian_fasilitator"`
 }
 
 type IndustriForNilai struct {
@@ -83,9 +94,9 @@ func GetIndustri(id_industri int) (IndustriForNilai, error) {
 
 }
 
-func GetNilaiByPembAndFasil(id_pembimbing, id_industri int) ([]NilaiSiswa, error) {
+func GetNilaiByPemb(id_pembimbing, id_industri int) ([]NilaiSiswaPklPembimbing, error) {
 
-	var nilai []NilaiSiswa
+	var nilai []NilaiSiswaPklPembimbing
 
 	query := ` SELECT 
     nis,nama,kelas,jurusan,rombel,
@@ -97,6 +108,26 @@ func GetNilaiByPembAndFasil(id_pembimbing, id_industri int) ([]NilaiSiswa, error
     WHERE fk_id_pembimbing = ? AND fk_id_industri = ?`
 
 	rows := DB.Database.Raw(query, id_pembimbing, id_industri).Scan(&nilai)
+	if rows.Error != nil {
+		return nilai, rows.Error
+	}
+
+	return nilai, nil
+
+}
+
+func GetNilaiByFasil(id_fasil, id_industri int) ([]NilaiSiswaPklFasilitator, error) {
+
+	var nilai []NilaiSiswaPklFasilitator
+
+	query := `SELECT 
+    nis,nama,kelas,jurusan,rombel,
+    nilai_softskill_fasilitator,
+    nilai_kemandirian_fasilitator
+    FROM data_siswa
+    WHERE fk_id_fasilitator = ? AND fk_id_industri = ?`
+
+	rows := DB.Database.Raw(query, id_fasil, id_industri).Scan(&nilai)
 	if rows.Error != nil {
 		return nilai, rows.Error
 	}
