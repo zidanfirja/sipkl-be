@@ -13,17 +13,24 @@ type IndustriPembimbingFasil struct {
 }
 
 type NilaiSiswaPkl struct {
-	NIS                         string `json:"nis"`
-	Nama                        string `json:"nama"`
-	Kelas                       string `json:"kelas"`
-	Jurusan                     string `json:"jurusan"`
-	Rombel                      string `json:"rombel"`
-	NilaiSoftskillFasilitator   int    `json:"nilai_softskill_fasilitator"`
-	NilaiSoftskillIndustri      int    `json:"nilai_softskill_industri"`
-	NilaiHardskillPembimbing    int    `json:"nilai_hardskill_pembimbing"`
-	NilaiHardskillIndustri      int    `json:"nilai_hardskill_industri"`
-	NilaiKemandirianFasilitator int    `json:"nilai_kemandirian_fasilitator"`
-	NilaiPengujianPembimbing    int    `json:"nilai_pengujian_pembimbing"`
+	NIS     string `json:"nis"`
+	Nama    string `json:"nama"`
+	Kelas   string `json:"kelas"`
+	Jurusan string `json:"jurusan"`
+	Rombel  string `json:"rombel"`
+
+	NilaiSoftskillFasilitator   int `json:"nilai_softskill_fasilitator"`
+	NilaiSoftskillIndustri      int `json:"nilai_softskill_industri"`
+	NilaiHardskillPembimbing    int `json:"nilai_hardskill_pembimbing"`
+	NilaiHardskillIndustri      int `json:"nilai_hardskill_industri"`
+	NilaiKemandirianFasilitator int `json:"nilai_kemandirian_fasilitator"`
+	NilaiPengujianPembimbing    int `json:"nilai_pengujian_pembimbing"`
+
+	TanggalMasuk  *time.Time `json:"tanggal_masuk" gorm:"date"`
+	TanggalKeluar *time.Time `json:"tanggal_keluar" gorm:"date"`
+
+	NamaIndustri string `json:"nama_industri" gorm:"type:varchar(255)" `
+	Alamat       string `json:"alamat" `
 }
 
 type NilaiSiswaPklPembimbing struct {
@@ -201,7 +208,7 @@ func UpdateNilaiFasilitator(data *[]ReqUpdateNilaiFasilitator) error {
 	var listNis []string
 	var caseNilaiSoftskillFasilitator, caseNilaiKemandirianFasilitator string
 
-	// NilaiSoftskillFasilitator   float64 `json:"nilai_softskilll_fasilitator"`
+	// NilaiSoftskillFasilitator   float64 `json:"nilai_softskill_fasilitator"`
 	// NilaiKemandirianFasilitator float64 `json:"nilai_kemandirian_fasilitator"`
 
 	for _, dataNilai := range *data {
@@ -230,12 +237,15 @@ func GetNilaiWakel(kelas, jurusan, rombel string) ([]NilaiSiswaPkl, error) {
 	var dataNilai []NilaiSiswaPkl
 
 	query := `
-	SELECT nis, nama, kelas, jurusan, rombel, 
+	SELECT nis, data_siswa.nama as nama, kelas, data_siswa.jurusan as  jurusan, rombel, 
 	nilai_softskill_fasilitator,nilai_softskill_industri, 
 	nilai_hardskill_pembimbing, nilai_hardskill_industri,
-	nilai_kemandirian_fasilitator, nilai_pengujian_pembimbing 
+	nilai_kemandirian_fasilitator, nilai_pengujian_pembimbing,
+    tanggal_masuk, tanggal_keluar,
+    industri.nama as nama_industri, industri.alamat as alamat
 	FROM data_siswa
-	WHERE kelas = ? AND jurusan = ? AND rombel = ?`
+    JOIN industri on industri.id  = data_siswa.fk_id_industri
+	WHERE data_siswa.kelas = ? AND data_siswa.jurusan = ? AND rombel = ?`
 
 	rows := DB.Database.Raw(query, kelas, jurusan, rombel).Scan(&dataNilai)
 	if rows.Error != nil {
