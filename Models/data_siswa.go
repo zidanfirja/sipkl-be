@@ -104,7 +104,18 @@ type DataNis struct {
 
 func GetDataPkl() ([]RespDataPkl, error) {
 	var rows []RespDataPkl
-	query := `SELECT i.id AS id_perusahaan, i.nama AS nama_perusahaan, p.id AS id_pembimbing, p.nama AS nama_pembimbing, f.id AS id_fasilitator, f.nama AS nama_fasilitator FROM data_siswa s LEFT JOIN industri i ON i.id = s.fk_id_industri LEFT JOIN pegawai p ON p.id = s.fk_id_pembimbing LEFT JOIN pegawai f ON f.id = s.fk_id_fasilitator GROUP BY i.id, p.id, f.id`
+	query := `SELECT 
+	i.id AS id_perusahaan, 
+	i.nama AS nama_perusahaan, 
+	p.id AS id_pembimbing, 
+	p.nama AS nama_pembimbing, 
+	f.id AS id_fasilitator, 
+	f.nama AS nama_fasilitator 
+	FROM data_siswa s 
+	LEFT JOIN industri i ON i.id = s.fk_id_industri 
+	LEFT JOIN pegawai p ON p.id = s.fk_id_pembimbing 
+	LEFT JOIN pegawai f ON f.id = s.fk_id_fasilitator 
+	GROUP BY i.id, p.id, f.id, i.nama,p.nama,f.nama`
 
 	// Menjalankan query
 	result := DB.Database.Raw(query).Scan(&rows)

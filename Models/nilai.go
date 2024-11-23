@@ -1,7 +1,9 @@
 package Models
 
 import (
+	"fmt"
 	DB "go-gin-mysql/Database"
+	"strings"
 	"time"
 )
 
@@ -40,6 +42,14 @@ type IndustriForNilai struct {
 	TanggalKeluar time.Time `json:"tanggal_keluar" gorm:"column:tanggal_keluar"`
 }
 
+type ReqUpdateNilaiPembimbing struct {
+	NIS                      string `json:"nis"`
+	NilaiSoftskillIndustri   int    `json:"nilai_softskill_industri"`
+	NilaiHardskillIndustri   int    `json:"nilai_hardskill_industri"`
+	NilaiHardskillPembimbing int    `json:"nilai_hardskill_pembimbing"`
+	NilaiPengujianPembimbing int    `json:"nilai_pengujian_pembimbing"`
+}
+
 func GetIndustriPembimbing(id int) ([]IndustriPembimbingFasil, error) {
 	var data []IndustriPembimbingFasil
 
@@ -48,7 +58,7 @@ func GetIndustriPembimbing(id int) ([]IndustriPembimbingFasil, error) {
 	JOIN pegawai ON pegawai.id = data_siswa.fk_id_pembimbing
 	JOIN industri ON industri.id = data_siswa.fk_id_industri
 	WHERE fk_id_pembimbing = ?
-	GROUP BY fk_id_industri`
+	GROUP BY fk_id_industri, industri.nama;`
 
 	rows := DB.Database.Raw(query, id).Scan(&data)
 	if rows.Error != nil {
@@ -66,7 +76,7 @@ func GetIndustriFasilitator(id int) ([]IndustriPembimbingFasil, error) {
 	JOIN pegawai ON pegawai.id = data_siswa.fk_id_fasilitator
 	JOIN industri ON industri.id = data_siswa.fk_id_industri
 	WHERE fk_id_fasilitator = ?
-    GROUP BY fk_id_industri`
+    GROUP BY fk_id_industri,  industri.nama `
 
 	rows := DB.Database.Raw(query, id).Scan(&data)
 	if rows.Error != nil {
@@ -134,4 +144,38 @@ func GetNilaiByFasil(id_fasil, id_industri int) ([]NilaiSiswaPklFasilitator, err
 
 	return nilai, nil
 
+}
+
+func UpdateNilaiPembimbing(data *[]ReqUpdateNilaiPembimbing) error {
+
+	// NilaiSoftskillIndustri   int    `json:"nilai_softskill_industri"`
+	// NilaiHardskillIndustri   int    `json:"nilai_hardskill_industri"`
+	// NilaiHardskillPembimbing int    `json:"nilai_hardskill_pembimbing"`
+	// NilaiPengujianPembimbing int    `json:"nilai_pengujian_pembimbing"`
+	var listNis []string
+	var caseNilaiSoftskillIndustri, caseNilaiHardskillIndustri, caseNilaiHardskillPembimbing, caseNilaiPengujianPembimbing string
+
+	for _, dataNilai := range *data {
+		listNis = append(listNis, fmt.Sprintf("'%s'", dataNilai.NIS))
+		caseNilaiSoftskillIndustri += fmt.Sprintf("WHEN '%s' THEN %d ", dataNilai.NIS, dataNilai.NilaiSoftskillIndustri)
+		caseNilaiHardskillIndustri += fmt.Sprintf("WHEN '%s' THEN %d ", dataNilai.NIS, dataNilai.NilaiHardskillIndustri)
+		caseNilaiHardskillPembimbing += fmt.Sprintf("WHEN '%s' THEN %d ", dataNilai.NIS, dataNilai.NilaiHardskillPembimbing)
+		caseNilaiPengujianPembimbing += fmt.Sprintf("WHEN '%s' THEN %d ", dataNilai.NIS, dataNilai.NilaiPengujianPembimbing)
+	}
+
+	query := fmt.Sprintf(`
+	UPDATE data_siswa
+	SET 
+	nilai_softskill_industri = CASE nis %s END,
+	nilai_hardskill_industri = CASE nis %s END,
+	nilai_hardskill_pembimbing = CASE nis %s END,
+	nilai_pengujian_pembimbing = CASE nis %s END,
+	WHERE nis IN (%s);
+`, caseNilaiSoftskillIndustri, caseNilaiHardskillIndustri, caseNilaiHardskillPembimbing, caseNilaiPengujianPembimbing, strings.Join(listNis, ", "))
+
+	if err := DB.Database.Exec(query).Error; err != nil {
+		return err
+	}
+
+	return nil
 }

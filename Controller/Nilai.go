@@ -1,6 +1,7 @@
 package Controllers
 
 import (
+	"encoding/json"
 	"go-gin-mysql/Models"
 	"net/http"
 	"strconv"
@@ -174,5 +175,61 @@ func GetNilaiFasilitator(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"data": nilai,
 	})
+
+}
+
+func UpdateNilaiPembimbing(c *gin.Context) {
+	var data interface{}
+	var nilai Models.ReqUpdateNilaiPembimbing
+
+	if err := c.ShouldBindJSON(&data); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	var listNilai []Models.ReqUpdateNilaiPembimbing
+
+	switch dataNilai := data.(type) {
+	case []interface{}:
+		for _, item := range dataNilai {
+			// Convert setiap item ke JSON dan bind ke struct
+			itemBytes, _ := json.Marshal(item)
+
+			if err := json.Unmarshal(itemBytes, &nilai); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data in array"})
+				return
+			}
+
+			listNilai = append(listNilai, nilai)
+
+		}
+	case map[string]interface{}:
+		// Handle a single object
+		itemBytes, _ := json.Marshal(dataNilai)
+
+		if err := json.Unmarshal(itemBytes, &nilai); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Invalid single object data",
+			})
+			return
+		}
+
+		listNilai = append(listNilai, nilai)
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "data yang di input tidak valid",
+		})
+		return
+	}
+
+	err := Models.UpdateNilaiPembimbing(&listNilai)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   err.Error(),
+			"message": "gagal update data",
+		})
+	}
 
 }
