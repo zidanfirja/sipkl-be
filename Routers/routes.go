@@ -60,6 +60,8 @@ func SetupRouter() *gin.Engine {
 		nilai.GET("/nilai-fasilitator/:id_fasilitator/:id_industri", Controllers.GetNilaiFasilitator)
 		nilai.PUT("/nilai-fasilitator/", Controllers.UpdateNilaiFasilitator)
 
+		nilai.GET("/nilai-walikelas/:kelas/:jurusan/:rombel", Controllers.GetNilaiPklWakel)
+
 	}
 	return route
 }

@@ -305,3 +305,45 @@ func UpdateNilaiFasilitator(c *gin.Context) {
 	})
 
 }
+
+func GetNilaiPklWakel(c *gin.Context) {
+	param_kelas := c.Param("kelas")
+	if param_kelas == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Parameter 'kelas' tidak ditemukan",
+			"message": "Silakan sertakan parameter 'kelas' dalam URL",
+		})
+		return
+	}
+
+	param_jurusan := c.Param("jurusan")
+	if param_jurusan == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Parameter 'jurusan' tidak ditemukan",
+			"message": "Silakan sertakan parameter 'juruasn' dalam URL",
+		})
+		return
+	}
+
+	param_rombel := c.Param("rombel")
+	if param_rombel == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Parameter 'rombel' tidak ditemukan",
+			"message": "Silakan sertakan parameter 'juruasn' dalam URL",
+		})
+		return
+	}
+
+	data, err := Models.GetNilaiWakel(param_kelas, param_jurusan, param_rombel)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": data,
+	})
+
+}

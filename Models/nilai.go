@@ -12,6 +12,20 @@ type IndustriPembimbingFasil struct {
 	Nama string `json:"nama"`
 }
 
+type NilaiSiswaPkl struct {
+	NIS                         string `json:"nis"`
+	Nama                        string `json:"nama"`
+	Kelas                       string `json:"kelas"`
+	Jurusan                     string `json:"jurusan"`
+	Rombel                      string `json:"rombel"`
+	NilaiSoftskillFasilitator   int    `json:"nilai_softskill_fasilitator"`
+	NilaiSoftskillIndustri      int    `json:"nilai_softskill_industri"`
+	NilaiHardskillPembimbing    int    `json:"nilai_hardskill_pembimbing"`
+	NilaiHardskillIndustri      int    `json:"nilai_hardskill_industri"`
+	NilaiKemandirianFasilitator int    `json:"nilai_kemandirian_fasilitator"`
+	NilaiPengujianPembimbing    int    `json:"nilai_pengujian_pembimbing"`
+}
+
 type NilaiSiswaPklPembimbing struct {
 	NIS                      string `json:"nis"`
 	Nama                     string `json:"nama"`
@@ -145,7 +159,7 @@ func GetNilaiByFasil(id_fasil, id_industri int) ([]NilaiSiswaPklFasilitator, err
 
 	rows := DB.Database.Raw(query, id_fasil, id_industri).Scan(&nilai)
 	if rows.Error != nil {
-		return nilai, rows.Error
+		return nil, rows.Error
 	}
 
 	return nilai, nil
@@ -210,4 +224,23 @@ func UpdateNilaiFasilitator(data *[]ReqUpdateNilaiFasilitator) error {
 	}
 
 	return nil
+}
+
+func GetNilaiWakel(kelas, jurusan, rombel string) ([]NilaiSiswaPkl, error) {
+	var dataNilai []NilaiSiswaPkl
+
+	query := `
+	SELECT nis, nama, kelas, jurusan, rombel, 
+	nilai_softskill_fasilitator,nilai_softskill_industri, 
+	nilai_hardskill_pembimbing, nilai_hardskill_industri,
+	nilai_kemandirian_fasilitator, nilai_pengujian_pembimbing 
+	FROM data_siswa
+	WHERE kelas = ? AND jurusan = ? AND rombel = ?`
+
+	rows := DB.Database.Raw(query, kelas, jurusan, rombel).Scan(&dataNilai)
+	if rows.Error != nil {
+		return nil, rows.Error
+	}
+
+	return dataNilai, nil
 }
