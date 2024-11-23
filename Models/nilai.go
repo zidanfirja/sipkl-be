@@ -2,11 +2,31 @@ package Models
 
 import (
 	DB "go-gin-mysql/Database"
+	"time"
 )
 
 type IndustriPembimbingFasil struct {
 	ID   int    `json:"id"`
 	Nama string `json:"nama"`
+}
+type NilaiSiswa struct {
+	NIS                      string `json:"nis"`
+	Nama                     string `json:"nama"`
+	Kelas                    string `json:"kelas"`
+	Jurusan                  string `json:"jurusan"`
+	Rombel                   string `json:"rombel"`
+	NilaiSoftskillIndustri   int    `json:"nilai_softskill_industri"`
+	NilaiHardskillIndustri   int    `json:"nilai_hardskill_industri"`
+	NilaiHardskillPembimbing int    `json:"nilai_hardskill_pembimbing"`
+	NilaiPengujianPembimbing int    `json:"nilai_pengujian_pembimbing"`
+}
+
+type IndustriForNilai struct {
+	ID            int       `json:"id_perusahaan" gorm:"column:id_perusahaan"`
+	Nama          string    `json:"nama_perusahaan" gorm:"column:nama_perusahaan"`
+	Alamat        string    `json:"alamat_perusahaan" gorm:"column:alamat_perusahaan"`
+	TanggalMasuk  time.Time `json:"tanggal_masuk" gorm:"column:tanggal_masuk"`
+	TanggalKeluar time.Time `json:"tanggal_keluar" gorm:"column:tanggal_keluar"`
 }
 
 func GetIndustriPembimbing(id int) ([]IndustriPembimbingFasil, error) {
@@ -43,4 +63,44 @@ func GetIndustriFasilitator(id int) ([]IndustriPembimbingFasil, error) {
 	}
 
 	return data, nil
+}
+
+func GetIndustri(id_industri int) (IndustriForNilai, error) {
+	var dataIndustri IndustriForNilai
+
+	query := `SELECT industri.id AS id_perusahaan, industri.nama AS nama_perusahaan,industri.alamat AS alamat_perusahaan, data_siswa.tanggal_masuk, data_siswa.tanggal_keluar from data_siswa 
+    JOIN pegawai on pegawai.id = data_siswa.fk_id_pembimbing
+    JOIN industri on industri.id = data_siswa.fk_id_industri
+    WHERE fk_id_industri = ?
+    LIMIT 1`
+
+	rows := DB.Database.Raw(query, id_industri).Scan(&dataIndustri)
+	if rows.Error != nil {
+		return dataIndustri, rows.Error
+	}
+
+	return dataIndustri, nil
+
+}
+
+func GetNilaiByPembAndFasil(id_pembimbing, id_industri int) ([]NilaiSiswa, error) {
+
+	var nilai []NilaiSiswa
+
+	query := ` SELECT 
+    nis,nama,kelas,jurusan,rombel,
+    nilai_softskill_industri,
+    nilai_hardskill_industri,
+    nilai_hardskill_pembimbing,
+    nilai_pengujian_pembimbing
+    FROM data_siswa
+    WHERE fk_id_pembimbing = ? AND fk_id_industri = ?`
+
+	rows := DB.Database.Raw(query, id_pembimbing, id_industri).Scan(&nilai)
+	if rows.Error != nil {
+		return nilai, rows.Error
+	}
+
+	return nilai, nil
+
 }

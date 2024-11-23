@@ -54,6 +54,7 @@ func SetupRouter() *gin.Engine {
 	{
 		nilai.GET("/industri-pembimbing/:id_pembimbing", Controllers.GetListIndustriPembimbing)
 		nilai.GET("/industri-fasilitator/:id_fasilitator", Controllers.GetListIndustriFasilitator)
+		nilai.GET("/nilai-pembimbing/:id_pembimbing/:id_industri", Controllers.GetNilaiPembimbing)
 	}
 	return route
 }
