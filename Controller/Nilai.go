@@ -198,7 +198,10 @@ func UpdateNilaiPembimbing(c *gin.Context) {
 			itemBytes, _ := json.Marshal(item)
 
 			if err := json.Unmarshal(itemBytes, &nilai); err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data in array"})
+				c.JSON(http.StatusBadRequest, gin.H{
+					"error":    err,
+					"mesasage": "Invalid data in array",
+				})
 				return
 			}
 
@@ -230,6 +233,75 @@ func UpdateNilaiPembimbing(c *gin.Context) {
 			"error":   err.Error(),
 			"message": "gagal update data",
 		})
+		return
 	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "berhasill update data nilai siswa",
+	})
+
+}
+
+func UpdateNilaiFasilitator(c *gin.Context) {
+	var data interface{}
+	var nilai Models.ReqUpdateNilaiFasilitator
+
+	if err := c.ShouldBindJSON(&data); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	var listNilai []Models.ReqUpdateNilaiFasilitator
+
+	switch dataNilai := data.(type) {
+	case []interface{}:
+		for _, item := range dataNilai {
+			// Convert setiap item ke JSON dan bind ke struct
+			itemBytes, _ := json.Marshal(item)
+
+			if err := json.Unmarshal(itemBytes, &nilai); err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"error":    err,
+					"mesasage": "Invalid data in array",
+				})
+				return
+			}
+
+			listNilai = append(listNilai, nilai)
+
+		}
+	case map[string]interface{}:
+		// Handle a single object
+		itemBytes, _ := json.Marshal(dataNilai)
+
+		if err := json.Unmarshal(itemBytes, &nilai); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Invalid single object data",
+			})
+			return
+		}
+
+		listNilai = append(listNilai, nilai)
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "data yang di input tidak valid",
+		})
+		return
+	}
+
+	err := Models.UpdateNilaiFasilitator(&listNilai)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   err.Error(),
+			"message": "gagal update data",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "berhasill update data nilai siswa",
+	})
 
 }

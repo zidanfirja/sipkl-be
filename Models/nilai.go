@@ -43,11 +43,17 @@ type IndustriForNilai struct {
 }
 
 type ReqUpdateNilaiPembimbing struct {
-	NIS                      string `json:"nis"`
-	NilaiSoftskillIndustri   int    `json:"nilai_softskill_industri"`
-	NilaiHardskillIndustri   int    `json:"nilai_hardskill_industri"`
-	NilaiHardskillPembimbing int    `json:"nilai_hardskill_pembimbing"`
-	NilaiPengujianPembimbing int    `json:"nilai_pengujian_pembimbing"`
+	NIS                      string  `json:"nis"`
+	NilaiSoftskillIndustri   float64 `json:"nilai_softskill_industri"`
+	NilaiHardskillIndustri   float64 `json:"nilai_hardskill_industri"`
+	NilaiHardskillPembimbing float64 `json:"nilai_hardskill_pembimbing"`
+	NilaiPengujianPembimbing float64 `json:"nilai_pengujian_pembimbing"`
+}
+
+type ReqUpdateNilaiFasilitator struct {
+	NIS                         string  `json:"nis"`
+	NilaiSoftskillFasilitator   float64 `json:"nilai_softskilll_fasilitator"`
+	NilaiKemandirianFasilitator float64 `json:"nilai_kemandirian_fasilitator"`
 }
 
 func GetIndustriPembimbing(id int) ([]IndustriPembimbingFasil, error) {
@@ -148,19 +154,15 @@ func GetNilaiByFasil(id_fasil, id_industri int) ([]NilaiSiswaPklFasilitator, err
 
 func UpdateNilaiPembimbing(data *[]ReqUpdateNilaiPembimbing) error {
 
-	// NilaiSoftskillIndustri   int    `json:"nilai_softskill_industri"`
-	// NilaiHardskillIndustri   int    `json:"nilai_hardskill_industri"`
-	// NilaiHardskillPembimbing int    `json:"nilai_hardskill_pembimbing"`
-	// NilaiPengujianPembimbing int    `json:"nilai_pengujian_pembimbing"`
 	var listNis []string
 	var caseNilaiSoftskillIndustri, caseNilaiHardskillIndustri, caseNilaiHardskillPembimbing, caseNilaiPengujianPembimbing string
 
 	for _, dataNilai := range *data {
 		listNis = append(listNis, fmt.Sprintf("'%s'", dataNilai.NIS))
-		caseNilaiSoftskillIndustri += fmt.Sprintf("WHEN '%s' THEN %d ", dataNilai.NIS, dataNilai.NilaiSoftskillIndustri)
-		caseNilaiHardskillIndustri += fmt.Sprintf("WHEN '%s' THEN %d ", dataNilai.NIS, dataNilai.NilaiHardskillIndustri)
-		caseNilaiHardskillPembimbing += fmt.Sprintf("WHEN '%s' THEN %d ", dataNilai.NIS, dataNilai.NilaiHardskillPembimbing)
-		caseNilaiPengujianPembimbing += fmt.Sprintf("WHEN '%s' THEN %d ", dataNilai.NIS, dataNilai.NilaiPengujianPembimbing)
+		caseNilaiSoftskillIndustri += fmt.Sprintf("WHEN '%s' THEN %f ", dataNilai.NIS, dataNilai.NilaiSoftskillIndustri)
+		caseNilaiHardskillIndustri += fmt.Sprintf("WHEN '%s' THEN %f ", dataNilai.NIS, dataNilai.NilaiHardskillIndustri)
+		caseNilaiHardskillPembimbing += fmt.Sprintf("WHEN '%s' THEN %f ", dataNilai.NIS, dataNilai.NilaiHardskillPembimbing)
+		caseNilaiPengujianPembimbing += fmt.Sprintf("WHEN '%s' THEN %f ", dataNilai.NIS, dataNilai.NilaiPengujianPembimbing)
 	}
 
 	query := fmt.Sprintf(`
@@ -169,9 +171,39 @@ func UpdateNilaiPembimbing(data *[]ReqUpdateNilaiPembimbing) error {
 	nilai_softskill_industri = CASE nis %s END,
 	nilai_hardskill_industri = CASE nis %s END,
 	nilai_hardskill_pembimbing = CASE nis %s END,
-	nilai_pengujian_pembimbing = CASE nis %s END,
+	nilai_pengujian_pembimbing = CASE nis %s END
 	WHERE nis IN (%s);
 `, caseNilaiSoftskillIndustri, caseNilaiHardskillIndustri, caseNilaiHardskillPembimbing, caseNilaiPengujianPembimbing, strings.Join(listNis, ", "))
+
+	if err := DB.Database.Exec(query).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func UpdateNilaiFasilitator(data *[]ReqUpdateNilaiFasilitator) error {
+
+	var listNis []string
+	var caseNilaiSoftskillFasilitator, caseNilaiKemandirianFasilitator string
+
+	// NilaiSoftskillFasilitator   float64 `json:"nilai_softskilll_fasilitator"`
+	// NilaiKemandirianFasilitator float64 `json:"nilai_kemandirian_fasilitator"`
+
+	for _, dataNilai := range *data {
+		listNis = append(listNis, fmt.Sprintf("'%s'", dataNilai.NIS))
+		caseNilaiSoftskillFasilitator += fmt.Sprintf("WHEN '%s' THEN %f ", dataNilai.NIS, dataNilai.NilaiSoftskillFasilitator)
+		caseNilaiKemandirianFasilitator += fmt.Sprintf("WHEN '%s' THEN %f ", dataNilai.NIS, dataNilai.NilaiKemandirianFasilitator)
+
+	}
+
+	query := fmt.Sprintf(`
+	UPDATE data_siswa
+	SET 
+	nilai_softskill_fasilitator = CASE nis %s END,
+	nilai_kemandirian_fasilitator = CASE nis %s END
+	WHERE nis IN (%s);
+`, caseNilaiSoftskillFasilitator, caseNilaiKemandirianFasilitator, strings.Join(listNis, ", "))
 
 	if err := DB.Database.Exec(query).Error; err != nil {
 		return err
