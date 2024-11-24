@@ -50,7 +50,7 @@ func Login(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error":   err.Error(),
-			"message": "error di create jwt",
+			"message": "Gagal membuat create token",
 		})
 		return
 	}
@@ -70,9 +70,7 @@ func CreateJwt(user *Models.Pegawai) (string, error) {
 	// cari role pegawai
 	role_pegawai, err := Models.GetRoleByIdPegawai(user.ID)
 	if err != nil {
-		current_role.IDRole = 0
-		current_role.NamaRole = ""
-		daftar_role = nil
+		return "", fmt.Errorf("anda belum memiliki role. error: %s", err.Error())
 	}
 
 	// masukan ke daftar role
@@ -114,4 +112,20 @@ func CreateJwt(user *Models.Pegawai) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+func PayloadLogin(c *gin.Context) {
+
+	payload, ok := c.Get("payload")
+	if !ok {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": "data tidak ditemukan",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": payload,
+	})
+
 }

@@ -54,19 +54,20 @@ func CheckAuthToken() gin.HandlerFunc {
 		}
 
 		// Ambil data claims jika token valid
-		// if claims, ok := token.Claims.(*CustomClaims); ok {
-		// 	// Set data ke context untuk digunakan di handler berikutnya
-		// 	c.Set("username", claims.Username)
-		// 	c.Set("role", claims.Role)
-		// } else {
-		// 	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
-		// 	c.Abort()
-		// 	return
-		// }
+		if claims, ok := token.Claims.(*Models.ClaimsUser); ok {
+			// Set data ke context untuk digunakan di handler berikutnya
+			c.Set("payload", claims)
+
+		} else {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
+			c.Abort()
+			return
+		}
 
 		// Lanjut ke handler berikutnya
 		c.Next()
 	}
+
 	// return func(c *gin.Context) {
 	// 	authHeader := c.GetHeader("Authorization")
 	// 	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
