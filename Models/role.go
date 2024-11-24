@@ -18,6 +18,11 @@ type Role struct {
 	CreatedAt time.Time `json:"created_at" gorm:"type:timestamp"`
 }
 
+type DataRole struct {
+	IDRole   int    `json:"id_role"`
+	NamaRole string `json:"nama_role"`
+}
+
 type DeleteRoleReq struct {
 	ID interface{} `json:"id" binding:"required"`
 }

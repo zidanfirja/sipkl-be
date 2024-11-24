@@ -20,8 +20,12 @@ func SetupRouter() *gin.Engine {
 		})
 	})
 
+	route.POST("/sipkl/v1/auth/login", Controllers.Login)
+
 	hubin := route.Group("/sipkl/v1/data/hubin/")
 	{
+		hubin.Use(Middleware.CheckAuthToken())
+
 		hubin.GET("/role", Controllers.GetAllRole)
 		hubin.POST("/role", Controllers.CreateNewRole)
 		hubin.DELETE("/role", Controllers.DeleteRole)
@@ -52,6 +56,9 @@ func SetupRouter() *gin.Engine {
 	nilai := route.Group("/sipkl/v1/data/nilai")
 
 	{
+
+		nilai.Use(Middleware.CheckAuthToken())
+
 		nilai.GET("/industri-pembimbing/:id_pembimbing", Controllers.GetListIndustriPembimbing)
 		nilai.GET("/nilai-pembimbing/:id_pembimbing/:id_industri", Controllers.GetNilaiPembimbing)
 		nilai.PUT("/nilai-pembimbing/", Controllers.UpdateNilaiPembimbing)

@@ -21,6 +21,7 @@ type DBConfig struct {
 	DBName   string
 	DBUrl    string
 	DBEnv    string
+	SecKey   string
 }
 
 func LoadDBConfig() DBConfig {
@@ -37,6 +38,7 @@ func LoadDBConfig() DBConfig {
 		DBName:   os.Getenv("DB_NAME"),
 		DBUrl:    os.Getenv("DATABASE_URL"),
 		DBEnv:    os.Getenv("DB_ENV"),
+		SecKey:   os.Getenv("SECRET_KEY"),
 	}
 
 }
