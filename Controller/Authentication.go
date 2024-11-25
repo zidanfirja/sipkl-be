@@ -5,6 +5,7 @@ import (
 	"go-gin-mysql/Models"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -123,9 +124,34 @@ func PayloadLogin(c *gin.Context) {
 		})
 		return
 	}
+	data, ok := payload.(Models.ClaimsUser)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "gagal parse data",
+		})
+		return
+	}
+
+	id_role := c.Query("id_role")
+	if id_role != "" {
+		idInt, err := strconv.Atoi(id_role)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "id role tidak bisa di kenversi ke int",
+			})
+			return
+		}
+
+		for _, dataRole := range data.DaftarRole {
+			if dataRole.IDRole == idInt {
+				data.CurrentRole.IDRole = idInt
+				data.CurrentRole.NamaRole = dataRole.NamaRole
+			}
+		}
+	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"data": payload,
+		"data": data,
 	})
 
 }
