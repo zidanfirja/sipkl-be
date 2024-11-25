@@ -115,6 +115,17 @@ func CreateJwt(user *Models.Pegawai) (string, error) {
 	return tokenString, nil
 }
 
+type NewDataPayloadToken struct {
+	Data Models.ClaimsUser `json:"data"`
+}
+
+type NewDataPayload struct {
+	User        Models.Userdata   `json:"userdata"`
+	CurrentRole Models.DataRole   `json:"current_role"`
+	DaftarRole  []Models.DataRole `json:"daftar_role"`
+	jwt.RegisteredClaims
+}
+
 func PayloadLogin(c *gin.Context) {
 
 	payload, ok := c.Get("payload")
@@ -124,14 +135,21 @@ func PayloadLogin(c *gin.Context) {
 		})
 		return
 	}
-	data, ok := payload.(Models.ClaimsUser)
+
+	payloadMap, ok := payload.(*Models.ClaimsUser)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "gagal parse data",
+			"error": "format payload tidak valid",
 		})
 		return
 	}
 
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"message": "sukses",
+	// 	"data":    payloadMap,
+	// })
+	// return
+	var newDataPayload Models.ClaimsUser
 	id_role := c.Query("id_role")
 	if id_role != "" {
 		idInt, err := strconv.Atoi(id_role)
@@ -142,16 +160,26 @@ func PayloadLogin(c *gin.Context) {
 			return
 		}
 
-		for _, dataRole := range data.DaftarRole {
+		for _, dataRole := range payloadMap.DaftarRole {
 			if dataRole.IDRole == idInt {
-				data.CurrentRole.IDRole = idInt
-				data.CurrentRole.NamaRole = dataRole.NamaRole
+				newDataPayload = Models.ClaimsUser{
+					User: payloadMap.User,
+					CurrentRole: Models.DataRole{
+						IDRole:   idInt,
+						NamaRole: dataRole.NamaRole,
+					},
+					DaftarRole: payloadMap.DaftarRole,
+				}
+				break
 			}
 		}
+		payloadMap = &newDataPayload
+
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"data": data,
+		"message": "sukses",
+		"data":    payloadMap,
 	})
 
 }
