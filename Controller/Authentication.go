@@ -1,6 +1,8 @@
 package Controllers
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"go-gin-mysql/Models"
 	"net/http"
@@ -11,7 +13,17 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/joho/godotenv"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
+
+var googleOauthConfig = &oauth2.Config{
+	RedirectURL:  "http://localhost:8080/callback",
+	ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
+	ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+	Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"},
+	Endpoint:     google.Endpoint,
+}
 
 func GetSecKey() string {
 
@@ -61,6 +73,12 @@ func Login(c *gin.Context) {
 		"jwt_token": stringTkn,
 	})
 
+}
+
+func LoginOAuth(c *gin.Context) {
+	state := "random-state-string" // Ganti dengan generator state yang aman
+	url := googleOauthConfig.AuthCodeURL(state)
+	c.Redirect(http.StatusTemporaryRedirect, url)
 }
 
 func CreateJwt(user *Models.Pegawai) (string, error) {
@@ -113,6 +131,77 @@ func CreateJwt(user *Models.Pegawai) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+func Callback(c *gin.Context) {
+	state := c.Query("state")
+	if state != "random-state-string" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid state"})
+		return
+	}
+
+	code := c.Query("code")
+	if code == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Code not found"})
+		return
+	}
+
+	token, err := googleOauthConfig.Exchange(context.Background(), code)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to exchange token"})
+		return
+	}
+
+	// ini mengambil data user dari google , nama , email,foto dll
+	client := googleOauthConfig.Client(context.Background(), token)
+	resp, err := client.Get("https://www.googleapis.com/oauth2/v2/userinfo")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user info"})
+		return
+	}
+	defer resp.Body.Close()
+
+	// ini untuk parse data dari google diatas ke struct yang ada
+	var user Models.UserInfoOAuth
+	if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse user info"})
+		return
+	}
+
+	//masukan data ke credential
+	var cred Models.Credential
+	cred.Email = user.Email
+
+	//cek ada tidaknya user dengan models.AuthenticateUserCekEmail()
+	dataUser, err := Models.AuthenticateUserCekEmail(&cred)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   err.Error(),
+			"message": "error di AuthenticateUser",
+		})
+		return
+	}
+
+	// jika ada :
+	// -- create jwt
+	stringTkn, err := CreateJwt(dataUser)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   err.Error(),
+			"message": "Gagal membuat create token",
+		})
+		return
+	}
+	// -- redirect ke halamn selanjutnya
+	urlSuccesLogin := fmt.Sprintf(os.Getenv("URL_PAGE_SUCCESS_LOGIN")+"%s", stringTkn)
+	c.Redirect(http.StatusFound, urlSuccesLogin)
+
+	// jika tidak ada
+	// -- redirect ke halaman sebelumnya
+	urlFailedLogin := os.Getenv("URL_PAGE_FAILED_LOGIN")
+	c.Redirect(http.StatusFound, urlFailedLogin)
+
+	// c.JSON(http.StatusOK, user)
 }
 
 type NewDataPayloadToken struct {

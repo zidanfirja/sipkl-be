@@ -20,6 +20,13 @@ type Userdata struct {
 	Email     string `json:"email"`
 }
 
+type UserInfoOAuth struct {
+	ID      string `json:"id"`
+	Email   string `json:"email"`
+	Name    string `json:"name"`
+	Picture string `json:"picture"`
+}
+
 type ClaimsUser struct {
 	User        Userdata   `json:"userdata"`
 	CurrentRole DataRole   `json:"current_role"`
@@ -45,6 +52,23 @@ func AuthenticateUser(user *Credential) (*Pegawai, error) {
 
 	errComparePass := bcrypt.CompareHashAndPassword([]byte(pegawai.Password), []byte(password))
 	if errComparePass != nil {
+		return nil, errors.New("data tidak ditemukan")
+	}
+
+	return &pegawai, nil
+}
+
+func AuthenticateUserCekEmail(user *Credential) (*Pegawai, error) {
+	var pegawai Pegawai
+
+	email := user.Email
+
+	rows := DB.Database.Where("email = ?", email).First(&pegawai)
+	if rows.Error != nil {
+		return nil, errors.New("data tidak ditemukan")
+	}
+
+	if rows.RowsAffected == 0 {
 		return nil, errors.New("data tidak ditemukan")
 	}
 
