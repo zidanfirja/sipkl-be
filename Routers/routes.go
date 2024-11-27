@@ -23,6 +23,7 @@ func SetupRouter() *gin.Engine {
 	route.POST("/sipkl/v1/auth/login", Controllers.Login)
 
 	route.POST("/sipkl/v1/auth/googlelogin", Controllers.LoginOAuth)
+	route.GET("/sipkl/v1/auth/callback", Controllers.Callback)
 
 	route.GET("/sipkl/v1/auth/verify", Middleware.CheckAuthToken(), Controllers.PayloadLogin)
 

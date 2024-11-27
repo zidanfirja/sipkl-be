@@ -18,7 +18,7 @@ import (
 )
 
 var googleOauthConfig = &oauth2.Config{
-	RedirectURL:  "http://localhost:8080/callback",
+	RedirectURL:  os.Getenv("RedirectURL"),
 	ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
 	ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
 	Scopes:       []string{"https://www.googleapis.com/auth/userinfo.profile", "https://www.googleapis.com/auth/userinfo.email"},
@@ -175,11 +175,10 @@ func Callback(c *gin.Context) {
 	//cek ada tidaknya user dengan models.AuthenticateUserCekEmail()
 	dataUser, err := Models.AuthenticateUserCekEmail(&cred)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   err.Error(),
-			"message": "error di AuthenticateUser",
-		})
-		return
+		// jika tidak ada
+		// -- redirect ke halaman sebelumnya
+		urlFailedLogin := os.Getenv("URL_PAGE_FAILED_LOGIN")
+		c.Redirect(http.StatusFound, urlFailedLogin)
 	}
 
 	// jika ada :
@@ -195,11 +194,6 @@ func Callback(c *gin.Context) {
 	// -- redirect ke halamn selanjutnya
 	urlSuccesLogin := fmt.Sprintf(os.Getenv("URL_PAGE_SUCCESS_LOGIN")+"%s", stringTkn)
 	c.Redirect(http.StatusFound, urlSuccesLogin)
-
-	// jika tidak ada
-	// -- redirect ke halaman sebelumnya
-	urlFailedLogin := os.Getenv("URL_PAGE_FAILED_LOGIN")
-	c.Redirect(http.StatusFound, urlFailedLogin)
 
 	// c.JSON(http.StatusOK, user)
 }
