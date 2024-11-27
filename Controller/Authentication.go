@@ -76,7 +76,7 @@ func Login(c *gin.Context) {
 }
 
 func LoginOAuth(c *gin.Context) {
-	state := os.Getenv("GENERATOR_STATE") // Ganti dengan generator state yang aman
+	state := "smkpu-negerijabarbandung" // Ganti dengan generator state yang aman
 	url := googleOauthConfig.AuthCodeURL(state)
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
@@ -135,7 +135,7 @@ func CreateJwt(user *Models.Pegawai) (string, error) {
 
 func Callback(c *gin.Context) {
 	state := c.Query("state")
-	if state != os.Getenv("GENERATOR_STATE") {
+	if state != "smkpu-negerijabarbandung" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid state"})
 		return
 	}
