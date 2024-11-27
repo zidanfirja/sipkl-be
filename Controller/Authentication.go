@@ -81,58 +81,6 @@ func LoginOAuth(c *gin.Context) {
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
 
-func CreateJwt(user *Models.Pegawai) (string, error) {
-
-	var current_role Models.DataRole
-	var daftar_role []Models.DataRole
-
-	// cari role pegawai
-	role_pegawai, err := Models.GetRoleByIdPegawai(user.ID)
-	if err != nil {
-		return "", fmt.Errorf("anda belum memiliki role. error: %s", err.Error())
-	}
-
-	// masukan ke daftar role
-	for _, data := range role_pegawai {
-		newDataRole := Models.DataRole{
-			IDRole:   data.IDRole,
-			NamaRole: data.Nama,
-		}
-
-		daftar_role = append(daftar_role, newDataRole)
-	}
-
-	//masukan current role
-	current_role.IDRole = daftar_role[0].IDRole
-	current_role.NamaRole = daftar_role[0].NamaRole
-
-	claims := Models.ClaimsUser{
-		User: Models.Userdata{
-			ID:        user.ID,
-			IdPegawai: user.IdPegawai,
-			Nama:      user.Nama,
-			Email:     user.Email,
-		},
-		CurrentRole: current_role,
-		DaftarRole:  daftar_role,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 2)),
-			Issuer:    "sipkl-smkpu",
-		},
-	}
-
-	SecKey := GetSecKey()
-	var jwtKey = []byte(SecKey)
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtKey)
-	if err != nil {
-		return "", err
-	}
-
-	return tokenString, nil
-}
-
 func Callback(c *gin.Context) {
 	state := c.Query("state")
 	if state != "smkpu-negerijabarbandung" {
@@ -195,7 +143,58 @@ func Callback(c *gin.Context) {
 	urlSuccesLogin := fmt.Sprintf(os.Getenv("URL_PAGE_SUCCESS_LOGIN")+"%s", stringTkn)
 	c.Redirect(http.StatusFound, urlSuccesLogin)
 
-	// c.JSON(http.StatusOK, user)
+}
+
+func CreateJwt(user *Models.Pegawai) (string, error) {
+
+	var current_role Models.DataRole
+	var daftar_role []Models.DataRole
+
+	// cari role pegawai
+	role_pegawai, err := Models.GetRoleByIdPegawai(user.ID)
+	if err != nil {
+		return "", fmt.Errorf("anda belum memiliki role. error: %s", err.Error())
+	}
+
+	// masukan ke daftar role
+	for _, data := range role_pegawai {
+		newDataRole := Models.DataRole{
+			IDRole:   data.IDRole,
+			NamaRole: data.Nama,
+		}
+
+		daftar_role = append(daftar_role, newDataRole)
+	}
+
+	//masukan current role
+	current_role.IDRole = daftar_role[0].IDRole
+	current_role.NamaRole = daftar_role[0].NamaRole
+
+	claims := Models.ClaimsUser{
+		User: Models.Userdata{
+			ID:        user.ID,
+			IdPegawai: user.IdPegawai,
+			Nama:      user.Nama,
+			Email:     user.Email,
+		},
+		CurrentRole: current_role,
+		DaftarRole:  daftar_role,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
+			Issuer:    "sipkl-smkpu",
+		},
+	}
+
+	SecKey := GetSecKey()
+	var jwtKey = []byte(SecKey)
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(jwtKey)
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
 }
 
 type NewDataPayloadToken struct {
@@ -227,13 +226,9 @@ func PayloadLogin(c *gin.Context) {
 		return
 	}
 
-	// c.JSON(http.StatusOK, gin.H{
-	// 	"message": "sukses",
-	// 	"data":    payloadMap,
-	// })
-	// return
 	var newDataPayload Models.ClaimsUser
 	id_role := c.Query("id_role")
+
 	if id_role != "" {
 		idInt, err := strconv.Atoi(id_role)
 		if err != nil {
@@ -252,6 +247,10 @@ func PayloadLogin(c *gin.Context) {
 						NamaRole: dataRole.NamaRole,
 					},
 					DaftarRole: payloadMap.DaftarRole,
+					RegisteredClaims: jwt.RegisteredClaims{
+						ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 2)),
+						Issuer:    "sipkl-smkpu",
+					},
 				}
 				break
 			}
@@ -260,9 +259,24 @@ func PayloadLogin(c *gin.Context) {
 
 	}
 
+	//membuat toke baru / refresh token
+	SecKey := GetSecKey()
+	var jwtKey = []byte(SecKey)
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payloadMap)
+	tokenString, err := token.SignedString(jwtKey)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "gagal",
+			"error":   "gagal membuat refresh token",
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"message": "sukses",
-		"data":    payloadMap,
+		"message":   "sukses",
+		"data":      payloadMap,
+		"jwt_token": tokenString,
 	})
 
 }
