@@ -238,6 +238,21 @@ func PayloadLogin(c *gin.Context) {
 			return
 		}
 
+		var daftarRole []Models.DataRole
+		role_pegawai, err := Models.GetRoleByIdPegawai(payloadMap.User.ID)
+		if err != nil {
+			daftarRole = nil
+		} else {
+			for _, data := range role_pegawai {
+				dataRole := Models.DataRole{
+					IDRole:   data.IDRole,
+					NamaRole: data.Nama,
+				}
+				daftarRole = append(daftarRole, dataRole)
+
+			}
+		}
+
 		for _, dataRole := range payloadMap.DaftarRole {
 			if dataRole.IDRole == idInt {
 				newDataPayload = Models.ClaimsUser{
@@ -246,7 +261,7 @@ func PayloadLogin(c *gin.Context) {
 						IDRole:   idInt,
 						NamaRole: dataRole.NamaRole,
 					},
-					DaftarRole: payloadMap.DaftarRole,
+					DaftarRole: daftarRole,
 					RegisteredClaims: jwt.RegisteredClaims{
 						ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24 * 2)),
 						Issuer:    "sipkl-smkpu",

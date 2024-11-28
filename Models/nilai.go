@@ -192,7 +192,8 @@ func UpdateNilaiPembimbing(data *[]ReqUpdateNilaiPembimbing) error {
 	nilai_softskill_industri = CASE nis %s END,
 	nilai_hardskill_industri = CASE nis %s END,
 	nilai_hardskill_pembimbing = CASE nis %s END,
-	nilai_pengujian_pembimbing = CASE nis %s END
+	nilai_pengujian_pembimbing = CASE nis %s END,
+	updated_at_nilai_pembimbing = NOW()
 	WHERE nis IN (%s);
 `, caseNilaiSoftskillIndustri, caseNilaiHardskillIndustri, caseNilaiHardskillPembimbing, caseNilaiPengujianPembimbing, strings.Join(listNis, ", "))
 
@@ -222,7 +223,8 @@ func UpdateNilaiFasilitator(data *[]ReqUpdateNilaiFasilitator) error {
 	UPDATE data_siswa
 	SET 
 	nilai_softskill_fasilitator = CASE nis %s END,
-	nilai_kemandirian_fasilitator = CASE nis %s END
+	nilai_kemandirian_fasilitator = CASE nis %s END,
+	updated_at_nilai_fasilitator = NOW()
 	WHERE nis IN (%s);
 `, caseNilaiSoftskillFasilitator, caseNilaiKemandirianFasilitator, strings.Join(listNis, ", "))
 

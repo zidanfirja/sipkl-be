@@ -59,7 +59,6 @@ func SetupRouter() *gin.Engine {
 	}
 
 	nilai := route.Group("/sipkl/v1/data/nilai")
-
 	{
 
 		nilai.Use(Middleware.CheckAuthToken())
@@ -75,5 +74,19 @@ func SetupRouter() *gin.Engine {
 		nilai.GET("/nilai-walikelas/:kelas/:jurusan/:rombel", Controllers.GetNilaiPklWakel)
 
 	}
+
+	dashboard := route.Group("/sipkl/v1/data/dashboard")
+	{
+		dashboard.Use(Middleware.CheckAuthToken())
+
+		dashboard.GET("/riwayat-pembimbing", Controllers.GetRiwayatUpdateNilaiPembimbing)
+		dashboard.GET("/jumlah-pembimbing", Controllers.GetJumlahPembimbing)
+		dashboard.GET("/jumlah-fasilitator", Controllers.GetJumlahFasilitator)
+		dashboard.GET("/jumlah-wakel", Controllers.GetJumlahWakel)
+		dashboard.GET("/jumlah-siswapkl", Controllers.GetJumlahSiswaPkl)
+		dashboard.GET("/jumlah-pemagku", Controllers.GetJumlahPemangku)
+
+	}
+
 	return route
 }

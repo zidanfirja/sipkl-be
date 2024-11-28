@@ -82,8 +82,10 @@ func NewDataPkl(c *gin.Context) {
 			dataSiswa.FKIdIndustri = siswa.FKIdIndustri
 			dataSiswa.FKIdPembimbing = siswa.FKIdPembimbing
 			dataSiswa.Aktif = true
-			created_at := time.Now()
-			dataSiswa.CreatedAt = created_at
+			// created_at := time.Now()
+			dataSiswa.CreatedAt = time.Now()
+			dataSiswa.UpdatedAtNilaiPembimbing = nil
+			dataSiswa.UpdatedAtNilaiFasilitator = nil
 
 			siswaList = append(siswaList, dataSiswa)
 		}
@@ -130,6 +132,8 @@ func NewDataPkl(c *gin.Context) {
 		dataSiswa.Aktif = true
 		created_at := time.Now()
 		dataSiswa.CreatedAt = created_at
+		dataSiswa.UpdatedAtNilaiPembimbing = nil
+		dataSiswa.UpdatedAtNilaiFasilitator = nil
 
 		// proses singele data
 		err := Models.AddDataPkl(&dataSiswa)

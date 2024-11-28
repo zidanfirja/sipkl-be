@@ -39,7 +39,9 @@ type DataSiswa struct {
 	NilaiKemandirianFasilitator int `json:"nilai_kemandirian_fasilitator"`
 	NilaiPengujianPembimbing    int `json:"nilai_pengujian_pembimbing"`
 
-	CreatedAt time.Time `json:"created_at" gorm:"type:timestamp"`
+	CreatedAt                 time.Time  `json:"created_at" gorm:"type:timestamp"`
+	UpdatedAtNilaiPembimbing  *time.Time `json:"updated_at_nilai_pembimbing" gorm:"type:timestamp"`
+	UpdatedAtNilaiFasilitator *time.Time `json:"updated_at_nilai_fasilitator" gorm:"type:timestamp"`
 }
 
 type ReqAddDataSiswa struct {
