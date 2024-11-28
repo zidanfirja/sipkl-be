@@ -80,11 +80,14 @@ func SetupRouter() *gin.Engine {
 		dashboard.Use(Middleware.CheckAuthToken())
 
 		dashboard.GET("/riwayat-pembimbing", Controllers.GetRiwayatUpdateNilaiPembimbing)
+		dashboard.GET("/riwayat-fasilitator", Controllers.GetRiwayatUpdateNilaiFasilitator)
+
 		dashboard.GET("/jumlah-pembimbing", Controllers.GetJumlahPembimbing)
 		dashboard.GET("/jumlah-fasilitator", Controllers.GetJumlahFasilitator)
 		dashboard.GET("/jumlah-wakel", Controllers.GetJumlahWakel)
 		dashboard.GET("/jumlah-siswapkl", Controllers.GetJumlahSiswaPkl)
 		dashboard.GET("/jumlah-pemagku", Controllers.GetJumlahPemangku)
+		dashboard.GET("/jumlah-hubim", Controllers.GetJumlahHubin)
 
 	}
 
