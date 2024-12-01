@@ -294,7 +294,7 @@ func GetCompleteNilaiPembimbing(id int) ([]CompleteNilaiPembimbing, error) {
 	var dataNilai []CompleteNilaiPembimbing
 
 	query := `
-	SELECT nis,data_siswa.nama,kelas,data_siswa.jurusan,rombel, industri.nama as nama_perusahaan, industri.alamat as alamat_perusahaan, tanggal_masuk,tanggal_keluar,nilai_softskill_industri,nilai_hardskill_industri,nilai_hardskill_pembimbing,nilai_pengujian_pembimbing, updated_at_nilai_pembimbing 
+	SELECT nis,data_siswa.nama,kelas,data_siswa.jurusan,rombel, industri.nama as nama_industri, industri.alamat as alamat_perusahaan, tanggal_masuk,tanggal_keluar,nilai_softskill_industri,nilai_hardskill_industri,nilai_hardskill_pembimbing,nilai_pengujian_pembimbing, updated_at_nilai_pembimbing 
 	FROM data_siswa 
 	JOIN industri on industri.id = data_siswa.fk_id_industri 
 	WHERE data_siswa.fk_id_pembimbing = ?`
@@ -312,7 +312,7 @@ func GetCompleteNilaiFasilitator(id int) ([]CompleteNilaiFasilitator, error) {
 	var dataNilai []CompleteNilaiFasilitator
 
 	query := `
-	SELECT nis,data_siswa.nama,kelas,data_siswa.jurusan,rombel, industri.nama as nama_perusahaan, industri.alamat as alamat_perusahaan, tanggal_masuk,tanggal_keluar,nilai_softskill_fasilitator, nilai_kemandirian_fasilitator, updated_at_nilai_fasilitator
+	SELECT nis,data_siswa.nama,kelas,data_siswa.jurusan,rombel, industri.nama as nama_industri, industri.alamat as alamat_industri, tanggal_masuk,tanggal_keluar,nilai_softskill_fasilitator, nilai_kemandirian_fasilitator, updated_at_nilai_fasilitator
 	FROM data_siswa
 	JOIN industri on industri.id = data_siswa.fk_id_industri
 	WHERE data_siswa.fk_id_fasilitator = ?`
