@@ -19,12 +19,12 @@ type NilaiSiswaPkl struct {
 	Jurusan string `json:"jurusan"`
 	Rombel  string `json:"rombel"`
 
-	NilaiSoftskillFasilitator   int `json:"nilai_softskill_fasilitator"`
-	NilaiSoftskillIndustri      int `json:"nilai_softskill_industri"`
-	NilaiHardskillPembimbing    int `json:"nilai_hardskill_pembimbing"`
-	NilaiHardskillIndustri      int `json:"nilai_hardskill_industri"`
-	NilaiKemandirianFasilitator int `json:"nilai_kemandirian_fasilitator"`
-	NilaiPengujianPembimbing    int `json:"nilai_pengujian_pembimbing"`
+	NilaiSoftskillFasilitator   float32 `json:"nilai_softskill_fasilitator"  gorm:"type:float"`
+	NilaiSoftskillIndustri      float32 `json:"nilai_softskill_industri"  gorm:"type:float"`
+	NilaiHardskillPembimbing    float32 `json:"nilai_hardskill_pembimbing"  gorm:"type:float"`
+	NilaiHardskillIndustri      float32 `json:"nilai_hardskill_industri"  gorm:"type:float"`
+	NilaiKemandirianFasilitator float32 `json:"nilai_kemandirian_fasilitator"  gorm:"type:float"`
+	NilaiPengujianPembimbing    float32 `json:"nilai_pengujian_pembimbing"  gorm:"type:float"`
 
 	TanggalMasuk  *time.Time `json:"tanggal_masuk" gorm:"date"`
 	TanggalKeluar *time.Time `json:"tanggal_keluar" gorm:"date"`
@@ -34,25 +34,25 @@ type NilaiSiswaPkl struct {
 }
 
 type NilaiSiswaPklPembimbing struct {
-	NIS                      string `json:"nis"`
-	Nama                     string `json:"nama"`
-	Kelas                    string `json:"kelas"`
-	Jurusan                  string `json:"jurusan"`
-	Rombel                   string `json:"rombel"`
-	NilaiSoftskillIndustri   int    `json:"nilai_softskill_industri"`
-	NilaiHardskillIndustri   int    `json:"nilai_hardskill_industri"`
-	NilaiHardskillPembimbing int    `json:"nilai_hardskill_pembimbing"`
-	NilaiPengujianPembimbing int    `json:"nilai_pengujian_pembimbing"`
+	NIS                      string  `json:"nis"`
+	Nama                     string  `json:"nama"`
+	Kelas                    string  `json:"kelas"`
+	Jurusan                  string  `json:"jurusan"`
+	Rombel                   string  `json:"rombel"`
+	NilaiSoftskillIndustri   float32 `json:"nilai_softskill_industri"  gorm:"type:float"`
+	NilaiHardskillIndustri   float32 `json:"nilai_hardskill_industri"  gorm:"type:float"`
+	NilaiHardskillPembimbing float32 `json:"nilai_hardskill_pembimbing"  gorm:"type:float"`
+	NilaiPengujianPembimbing float32 `json:"nilai_pengujian_pembimbing"  gorm:"type:float"`
 }
 
 type NilaiSiswaPklFasilitator struct {
-	NIS                         string `json:"nis"`
-	Nama                        string `json:"nama"`
-	Kelas                       string `json:"kelas"`
-	Jurusan                     string `json:"jurusan"`
-	Rombel                      string `json:"rombel"`
-	NilaiSoftskillFasilitator   int    `json:"nilai_softskill_fasilitator"`
-	NilaiKemandirianFasilitator int    `json:"nilai_kemandirian_fasilitator"`
+	NIS                         string  `json:"nis"`
+	Nama                        string  `json:"nama"`
+	Kelas                       string  `json:"kelas"`
+	Jurusan                     string  `json:"jurusan"`
+	Rombel                      string  `json:"rombel"`
+	NilaiSoftskillFasilitator   float32 `json:"nilai_softskill_fasilitator"  gorm:"type:float"`
+	NilaiKemandirianFasilitator float32 `json:"nilai_kemandirian_fasilitator"  gorm:"type:float"`
 }
 
 type IndustriForNilai struct {
@@ -65,16 +65,16 @@ type IndustriForNilai struct {
 
 type ReqUpdateNilaiPembimbing struct {
 	NIS                      string  `json:"nis"`
-	NilaiSoftskillIndustri   float64 `json:"nilai_softskill_industri"`
-	NilaiHardskillIndustri   float64 `json:"nilai_hardskill_industri"`
-	NilaiHardskillPembimbing float64 `json:"nilai_hardskill_pembimbing"`
-	NilaiPengujianPembimbing float64 `json:"nilai_pengujian_pembimbing"`
+	NilaiSoftskillIndustri   float32 `json:"nilai_softskill_industri"  gorm:"type:float"`
+	NilaiHardskillIndustri   float32 `json:"nilai_hardskill_industri"  gorm:"type:float"`
+	NilaiHardskillPembimbing float32 `json:"nilai_hardskill_pembimbing"  gorm:"type:float"`
+	NilaiPengujianPembimbing float32 `json:"nilai_pengujian_pembimbing"  gorm:"type:float"`
 }
 
 type ReqUpdateNilaiFasilitator struct {
 	NIS                         string  `json:"nis"`
-	NilaiSoftskillFasilitator   float64 `json:"nilai_softskill_fasilitator"`
-	NilaiKemandirianFasilitator float64 `json:"nilai_kemandirian_fasilitator"`
+	NilaiSoftskillFasilitator   float32 `json:"nilai_softskill_fasilitator"  gorm:"type:float"`
+	NilaiKemandirianFasilitator float32 `json:"nilai_kemandirian_fasilitator"  gorm:"type:float"`
 }
 
 type CompleteNilaiPembimbing struct {
@@ -87,10 +87,10 @@ type CompleteNilaiPembimbing struct {
 	AlamatIndustri           string     `json:"alamat_industri"`
 	TanggalMasuk             *time.Time `json:"tanggal_masuk" gorm:"date"`
 	TanggalKeluar            *time.Time `json:"tanggal_keluar" gorm:"date"`
-	NilaiSoftskillIndustri   int        `json:"nilai_softskill_industri"`
-	NilaiHardskillIndustri   int        `json:"nilai_hardskill_industri"`
-	NilaiHardskillPembimbing int        `json:"nilai_hardskill_pembimbing"`
-	NilaiPengujianPembimbing int        `json:"nilai_pengujian_pembimbing"`
+	NilaiSoftskillIndustri   float32    `json:"nilai_softskill_industri" gorm:"type:float"`
+	NilaiHardskillIndustri   float32    `json:"nilai_hardskill_industri" gorm:"type:float"`
+	NilaiHardskillPembimbing float32    `json:"nilai_hardskill_pembimbing" gorm:"type:float"`
+	NilaiPengujianPembimbing float32    `json:"nilai_pengujian_pembimbing" gorm:"type:float"`
 	UpdatedAtNilaiPembimbing *time.Time `json:"updated_at_nilai_pembimbing" gorm:"type:timestamp"`
 }
 
@@ -104,8 +104,8 @@ type CompleteNilaiFasilitator struct {
 	AlamatIndustri              string     `json:"alamat_industri"`
 	TanggalMasuk                *time.Time `json:"tanggal_masuk" gorm:"date"`
 	TanggalKeluar               *time.Time `json:"tanggal_keluar" gorm:"date"`
-	NilaiSoftskillFasilitator   float64    `json:"nilai_softskill_fasilitator"`
-	NilaiKemandirianFasilitator float64    `json:"nilai_kemandirian_fasilitator"`
+	NilaiSoftskillFasilitator   float32    `json:"nilai_softskill_fasilitator" gorm:"type:float"`
+	NilaiKemandirianFasilitator float32    `json:"nilai_kemandirian_fasilitator" gorm:"type:float"`
 	UpdatedAtNilaiFasilitator   *time.Time `json:"updated_at_nilai_fasilitator"`
 }
 
@@ -241,8 +241,8 @@ func UpdateNilaiFasilitator(data *[]ReqUpdateNilaiFasilitator) error {
 	var listNis []string
 	var caseNilaiSoftskillFasilitator, caseNilaiKemandirianFasilitator string
 
-	// NilaiSoftskillFasilitator   float64 `json:"nilai_softskill_fasilitator"`
-	// NilaiKemandirianFasilitator float64 `json:"nilai_kemandirian_fasilitator"`
+	// NilaiSoftskillFasilitator   float32 `json:"nilai_softskill_fasilitator"`
+	// NilaiKemandirianFasilitator float32 `json:"nilai_kemandirian_fasilitator"`
 
 	for _, dataNilai := range *data {
 		listNis = append(listNis, fmt.Sprintf("'%s'", dataNilai.NIS))
@@ -294,7 +294,7 @@ func GetCompleteNilaiPembimbing(id int) ([]CompleteNilaiPembimbing, error) {
 	var dataNilai []CompleteNilaiPembimbing
 
 	query := `
-	SELECT nis,data_siswa.nama,kelas,data_siswa.jurusan,rombel, industri.nama as nama_industri, industri.alamat as alamat_perusahaan, tanggal_masuk,tanggal_keluar,nilai_softskill_industri,nilai_hardskill_industri,nilai_hardskill_pembimbing,nilai_pengujian_pembimbing, updated_at_nilai_pembimbing 
+	SELECT nis,data_siswa.nama,kelas,data_siswa.jurusan,rombel, industri.nama as nama_industri, industri.alamat as alamat_industri, tanggal_masuk,tanggal_keluar,nilai_softskill_industri,nilai_hardskill_industri,nilai_hardskill_pembimbing,nilai_pengujian_pembimbing, updated_at_nilai_pembimbing as updated_at
 	FROM data_siswa 
 	JOIN industri on industri.id = data_siswa.fk_id_industri 
 	WHERE data_siswa.fk_id_pembimbing = ?`
@@ -312,7 +312,7 @@ func GetCompleteNilaiFasilitator(id int) ([]CompleteNilaiFasilitator, error) {
 	var dataNilai []CompleteNilaiFasilitator
 
 	query := `
-	SELECT nis,data_siswa.nama,kelas,data_siswa.jurusan,rombel, industri.nama as nama_industri, industri.alamat as alamat_industri, tanggal_masuk,tanggal_keluar,nilai_softskill_fasilitator, nilai_kemandirian_fasilitator, updated_at_nilai_fasilitator
+	SELECT nis,data_siswa.nama,kelas,data_siswa.jurusan,rombel, industri.nama as nama_industri, industri.alamat as alamat_industri, tanggal_masuk,tanggal_keluar,nilai_softskill_fasilitator, nilai_kemandirian_fasilitator, updated_at_nilai_fasilitator as updated_at
 	FROM data_siswa
 	JOIN industri on industri.id = data_siswa.fk_id_industri
 	WHERE data_siswa.fk_id_fasilitator = ?`
