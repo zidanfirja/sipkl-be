@@ -63,6 +63,10 @@ func SetupRouter() *gin.Engine {
 
 		nilai.Use(Middleware.CheckAuthToken())
 
+		// new revisi
+		nilai.GET("/nilai-fasilitator/:id_fasilitator", Controllers.GetCompleteNilaiFasilitator)
+		nilai.GET("/nilai-pembimbing/:id_pembimbing", Controllers.GetCompleteNilaiPembimbing)
+
 		nilai.GET("/industri-pembimbing/:id_pembimbing", Controllers.GetListIndustriPembimbing)
 		nilai.GET("/nilai-pembimbing/:id_pembimbing/:id_industri", Controllers.GetNilaiPembimbing)
 		nilai.PUT("/nilai-pembimbing/", Controllers.UpdateNilaiPembimbing)

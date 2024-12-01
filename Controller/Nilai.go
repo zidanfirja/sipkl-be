@@ -347,3 +347,47 @@ func GetNilaiPklWakel(c *gin.Context) {
 	})
 
 }
+
+func GetCompleteNilaiPembimbing(c *gin.Context) {
+	param := c.Param("id_pembimbing")
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "id hasul",
+		})
+		return
+	}
+	data, err := Models.GetCompleteNilaiPembimbing(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": data,
+	})
+}
+
+func GetCompleteNilaiFasilitator(c *gin.Context) {
+	param := c.Param("id_fasilitator")
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "id hasul",
+		})
+		return
+	}
+	data, err := Models.GetCompleteNilaiFasilitator(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": data,
+	})
+}

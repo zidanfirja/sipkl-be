@@ -77,6 +77,38 @@ type ReqUpdateNilaiFasilitator struct {
 	NilaiKemandirianFasilitator float64 `json:"nilai_kemandirian_fasilitator"`
 }
 
+type CompleteNilaiPembimbing struct {
+	NIS                      string     `json:"nis"`
+	Nama                     string     `json:"nama"`
+	Kelas                    string     `json:"kelas"`
+	Jurusan                  string     `json:"jurusan"`
+	Rombel                   string     `json:"rombel"`
+	NamaIndustri             string     `json:"nama_industri"`
+	AlamatIndustri           string     `json:"alamat_industri"`
+	TanggalMasuk             *time.Time `json:"tanggal_masuk" gorm:"date"`
+	TanggalKeluar            *time.Time `json:"tanggal_keluar" gorm:"date"`
+	NilaiSoftskillIndustri   int        `json:"nilai_softskill_industri"`
+	NilaiHardskillIndustri   int        `json:"nilai_hardskill_industri"`
+	NilaiHardskillPembimbing int        `json:"nilai_hardskill_pembimbing"`
+	NilaiPengujianPembimbing int        `json:"nilai_pengujian_pembimbing"`
+	UpdatedAtNilaiPembimbing *time.Time `json:"updated_at_nilai_pembimbing" gorm:"type:timestamp"`
+}
+
+type CompleteNilaiFasilitator struct {
+	NIS                         string     `json:"nis"`
+	Nama                        string     `json:"nama"`
+	Kelas                       string     `json:"kelas"`
+	Jurusan                     string     `json:"jurusan"`
+	Rombel                      string     `json:"rombel"`
+	NamaIndustri                string     `json:"nama_industri"`
+	AlamatIndustri              string     `json:"alamat_industri"`
+	TanggalMasuk                *time.Time `json:"tanggal_masuk" gorm:"date"`
+	TanggalKeluar               *time.Time `json:"tanggal_keluar" gorm:"date"`
+	NilaiSoftskillFasilitator   float64    `json:"nilai_softskill_fasilitator"`
+	NilaiKemandirianFasilitator float64    `json:"nilai_kemandirian_fasilitator"`
+	UpdatedAtNilaiFasilitator   *time.Time `json:"updated_at_nilai_fasilitator"`
+}
+
 func GetIndustriPembimbing(id int) ([]IndustriPembimbingFasil, error) {
 	var data []IndustriPembimbingFasil
 
@@ -250,6 +282,42 @@ func GetNilaiWakel(kelas, jurusan, rombel string) ([]NilaiSiswaPkl, error) {
 	WHERE data_siswa.kelas = ? AND data_siswa.jurusan = ? AND rombel = ?`
 
 	rows := DB.Database.Raw(query, kelas, jurusan, rombel).Scan(&dataNilai)
+	if rows.Error != nil {
+		return nil, rows.Error
+	}
+
+	return dataNilai, nil
+}
+
+func GetCompleteNilaiPembimbing(id int) ([]CompleteNilaiPembimbing, error) {
+
+	var dataNilai []CompleteNilaiPembimbing
+
+	query := `
+	SELECT nis,data_siswa.nama,kelas,data_siswa.jurusan,rombel, industri.nama as nama_perusahaan, industri.alamat as alamat_perusahaan, tanggal_masuk,tanggal_keluar,nilai_softskill_industri,nilai_hardskill_industri,nilai_hardskill_pembimbing,nilai_pengujian_pembimbing, updated_at_nilai_pembimbing 
+	FROM data_siswa 
+	JOIN industri on industri.id = data_siswa.fk_id_industri 
+	WHERE data_siswa.fk_id_pembimbing = ?`
+
+	rows := DB.Database.Raw(query, id).Scan(&dataNilai)
+	if rows.Error != nil {
+		return nil, rows.Error
+	}
+
+	return dataNilai, nil
+}
+
+func GetCompleteNilaiFasilitator(id int) ([]CompleteNilaiFasilitator, error) {
+
+	var dataNilai []CompleteNilaiFasilitator
+
+	query := `
+	SELECT nis,data_siswa.nama,kelas,data_siswa.jurusan,rombel, industri.nama as nama_perusahaan, industri.alamat as alamat_perusahaan, tanggal_masuk,tanggal_keluar,nilai_softskill_fasilitator, nilai_kemandirian_fasilitator, updated_at_nilai_fasilitator
+	FROM data_siswa
+	JOIN industri on industri.id = data_siswa.fk_id_industri
+	WHERE data_siswa.fk_id_fasilitator = ?`
+
+	rows := DB.Database.Raw(query, id).Scan(&dataNilai)
 	if rows.Error != nil {
 		return nil, rows.Error
 	}
