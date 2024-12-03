@@ -109,6 +109,32 @@ type CompleteNilaiFasilitator struct {
 	UpdatedAtNilaiFasilitator   *time.Time `json:"updated_at_nilai_fasilitator"`
 }
 
+type NilaiAllSiswa struct {
+	Nama                        string    `json:"nama"`
+	Kelas                       string    `json:"kelas"`
+	Jurusan                     string    `json:"jurusan"`
+	Rombel                      string    `json:"rombel"`
+	NIS                         string    `json:"nis"`
+	NilaiSoftskillFasilitator   float32   `json:"nilai_softskill_fasilitator"`
+	NilaiSoftskillIndustri      float32   `json:"nilai_softskill_industri"`
+	NilaiHardskillPembimbing    float32   `json:"nilai_hardskill_pembimbing"`
+	NilaiHardskillIndustri      float32   `json:"nilai_hardskill_industri"`
+	NilaiKemandirianFasilitator float32   `json:"nilai_kemandirian_fasilitator"`
+	NilaiPengujianPembimbing    float32   `json:"nilai_pengujian_pembimbing"`
+	NamaPembimbing              string    `json:"nama_pembimbing"`
+	NamaFasilitator             string    `json:"nama_fasilitator"`
+	NamaIndustri                string    `json:"nama_industri"`
+	AlamatIndustri              string    `json:"alamat_industri"`
+	UpdatedAtNilaiFasilitator   time.Time `json:"updated_at_nilai_fasilitator"`
+	UpdatedAtNilaiPembimbing    time.Time `json:"updated_at_nilai_pembimbing"`
+}
+
+// SELECT ds.nama as nama, ds.kelas, ds.jurusan as jurusan, ds.rombel, ds.nis
+// nilai_softskill_fasilitator, nilai_softskill_industri, nilai_hardskill_pembimbing, nilai_hardskill_industri, nilai_kemandirian_fasilitator, nilai_pengujian_pembimbing,
+// p.nama as nama_pembimbing, p.nama as nama_fasilitator,
+// industri.nama as nama_industri, industri.alamat as nama_industri, updated_at_nilai_pembimbing, updated_at_nilai_fasilitator FROM data_siswa ds
+// JOIN industri i on i.id = data_siswa.fk_id_industri
+
 func GetIndustriPembimbing(id int) ([]IndustriPembimbingFasil, error) {
 	var data []IndustriPembimbingFasil
 
@@ -318,6 +344,46 @@ func GetCompleteNilaiFasilitator(id int) ([]CompleteNilaiFasilitator, error) {
 	WHERE data_siswa.fk_id_fasilitator = ?`
 
 	rows := DB.Database.Raw(query, id).Scan(&dataNilai)
+	if rows.Error != nil {
+		return nil, rows.Error
+	}
+
+	return dataNilai, nil
+}
+
+func GetAllNilaiPKL() ([]NilaiAllSiswa, error) {
+	var dataNilai []NilaiAllSiswa
+
+	query := `
+	SELECT 
+    ds.nama AS nama,
+    ds.kelas AS kelas,
+    ds.jurusan AS jurusan,
+    ds.rombel AS rombel,
+    ds.nis AS nis,
+    nilai_softskill_fasilitator,
+    nilai_softskill_industri,
+    nilai_hardskill_pembimbing,
+    nilai_hardskill_industri,
+    nilai_kemandirian_fasilitator,
+    nilai_pengujian_pembimbing,
+    p.nama AS nama_pembimbing,
+    f.nama AS nama_fasilitator,
+    i.nama AS nama_industri,
+    i.alamat AS alamat_industri,
+    updated_at_nilai_pembimbing,
+    updated_at_nilai_fasilitator
+FROM 
+    data_siswa ds
+JOIN 
+    industri i ON i.id = ds.fk_id_industri
+JOIN 
+    pegawai p ON p.id = ds.fk_id_pembimbing
+JOIN 
+    pegawai f ON f.id = ds.fk_id_fasilitator
+
+	`
+	rows := DB.Database.Raw(query).Scan(&dataNilai)
 	if rows.Error != nil {
 		return nil, rows.Error
 	}

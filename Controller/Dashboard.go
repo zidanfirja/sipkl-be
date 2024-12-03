@@ -49,7 +49,7 @@ func GetJumlahPembimbing(c *gin.Context) {
 		"data":    total,
 		"message": "success",
 	})
-	return
+
 }
 
 func GetJumlahFasilitator(c *gin.Context) {
@@ -64,7 +64,7 @@ func GetJumlahFasilitator(c *gin.Context) {
 		"data":    total,
 		"message": "success",
 	})
-	return
+
 }
 
 func GetJumlahHubin(c *gin.Context) {
@@ -79,7 +79,7 @@ func GetJumlahHubin(c *gin.Context) {
 		"data":    total,
 		"message": "success",
 	})
-	return
+
 }
 
 func GetJumlahSiswaPkl(c *gin.Context) {
@@ -94,7 +94,7 @@ func GetJumlahSiswaPkl(c *gin.Context) {
 		"data":    total,
 		"message": "success",
 	})
-	return
+
 }
 
 func GetJumlahPemangku(c *gin.Context) {
@@ -109,7 +109,7 @@ func GetJumlahPemangku(c *gin.Context) {
 		"data":    total,
 		"message": "success",
 	})
-	return
+
 }
 
 func GetJumlahWakel(c *gin.Context) {
@@ -124,5 +124,19 @@ func GetJumlahWakel(c *gin.Context) {
 		"data":    total,
 		"message": "success",
 	})
-	return
+
+}
+
+func AllDataNilaiPKL(c *gin.Context) {
+	data, err := Models.GetAllNilaiPKL()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": data,
+	})
 }

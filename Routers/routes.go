@@ -93,6 +93,9 @@ func SetupRouter() *gin.Engine {
 		dashboard.GET("/jumlah-pemagku", Controllers.GetJumlahPemangku)
 		dashboard.GET("/jumlah-hubim", Controllers.GetJumlahHubin)
 
+		dashboard.GET("/siswa", Controllers.AllDataNilaiPKL)
+		
+
 	}
 
 	return route
