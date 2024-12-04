@@ -210,7 +210,9 @@ func UpdatePegawai(c *gin.Context) {
 		return
 	}
 
-	passwordValue = HashPassword(passwordValue.(string))
+	bcryptPass := HashPassword(passwordValue.(string))
+
+	pegawai.Payload["password"] = bcryptPass
 
 	switch ids := pegawai.ID.(type) {
 	case float64:
