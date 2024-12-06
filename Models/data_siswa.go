@@ -56,7 +56,9 @@ type DataSiswaRaw struct {
 	TanggalMasuk  *time.Time `json:"tanggal_masuk" gorm:"date"`
 	TanggalKeluar *time.Time `json:"tanggal_keluar" gorm:"date"`
 
+	IdPembimbing    int    `json:"id_pembimbing"`
 	NamaPembimbing  string `json:"nama_pembimbing"`
+	IdFasilitator   int    `json:"id_fasilitator"`
 	NamaFasilitator string `json:"nama_fasilitator"`
 	NamaIndustri    string `json:"nama_industri"`
 	AlamatIndustri  string `json:"alamat_industri"`
@@ -310,7 +312,7 @@ func GetRawDataPkl() ([]DataSiswaRaw, error) {
 	query := `
 	SELECT ds.nis,ds.nama as nama, ds.kelas, ds.jurusan as jurusan, ds.rombel,ds.aktif,
 	ds.tanggal_masuk, ds.tanggal_keluar,
-	p.nama as nama_pembimbing, f.nama as nama_fasilitator,
+	p.id_pegawai as id_pembimbing, p.nama as nama_pembimbing,f.id_pegawai as id_fasilitator,f.nama as nama_fasilitator,
 	i.nama as nama_industri, i.alamat as alamat_industri,
 	ds.updated_at_nilai_pembimbing, ds.updated_at_nilai_fasilitator
 	FROM data_siswa ds
