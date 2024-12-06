@@ -132,32 +132,85 @@ type DataNis struct {
 
 func GetDataPkl() ([]RespDataPkl, error) {
 	var rows []RespDataPkl
-	query := `SELECT 
-	i.id AS id_perusahaan, 
-	i.nama AS nama_perusahaan, 
-	p.id AS id_pembimbing, 
-	p.nama AS nama_pembimbing, 
-	f.id AS id_fasilitator, 
-	f.nama AS nama_fasilitator 
+	// Query yang diperluas untuk mengambil semua data dalam satu panggilan
+	query := `
+	SELECT 
+		i.id AS id_perusahaan, 
+		i.nama AS nama_perusahaan, 
+		p.id AS id_pembimbing, 
+		p.nama AS nama_pembimbing, 
+		f.id AS id_fasilitator, 
+		f.nama AS nama_fasilitator, 
+		s.nis AS nis,
+		s.nama AS nama_siswa,
+		s.kelas AS kelas,
+		s.tanggal_masuk AS tanggal_masuk,
+		s.tanggal_keluar AS tanggal_keluar,
+		s.jurusan AS jurusan,
+		s.rombel AS rombel
 	FROM data_siswa s 
 	LEFT JOIN industri i ON i.id = s.fk_id_industri 
 	LEFT JOIN pegawai p ON p.id = s.fk_id_pembimbing 
-	LEFT JOIN pegawai f ON f.id = s.fk_id_fasilitator 
-	GROUP BY i.id, p.id, f.id, i.nama,p.nama,f.nama`
+	LEFT JOIN pegawai f ON f.id = s.fk_id_fasilitator
+	ORDER BY i.id, p.id, f.id
+	`
 
-	// Menjalankan query
-	result := DB.Database.Raw(query).Scan(&rows)
+	// Struct sementara untuk menyimpan data query
+	type TempRow struct {
+		IDPerusahaan    int       `json:"id_perusahaan"`
+		NamaPerusahaan  string    `json:"nama_perusahaan"`
+		IDPembimbing    int       `json:"id_pembimbing"`
+		NamaPembimbing  string    `json:"nama_pembimbing"`
+		IDFasilitator   int       `json:"id_fasilitator"`
+		NamaFasilitator string    `json:"nama_fasilitator"`
+		NIS             string    `json:"nis"`
+		NamaSiswa       string    `json:"nama"`
+		Kelas           string    `json:"kelas"`
+		TanggalMasuk    time.Time `json:"tanggal_masuk"`
+		TanggalKeluar   time.Time `json:"tanggal_keluar"`
+		Jurusan         string    `json:"jurusan"`
+		Rombel          string    `json:"rombel"`
+	}
+
+	var tempRows []TempRow
+	// Eksekusi query
+	result := DB.Database.Raw(query).Scan(&tempRows)
 	if result.Error != nil {
-		fmt.Println("Gagal mengambl data:", result.Error)
+		fmt.Println("Gagal mengambil data:", result.Error)
 		return nil, result.Error
 	}
 
-	for i := range rows {
-		dataSiswa, err := GetSiswaByIndustri(rows[i].IDPerusahaan)
-		if err != nil {
-			return nil, err
+	// Menggabungkan data menjadi struktur akhir
+	dataMap := make(map[int]*RespDataPkl)
+	for _, row := range tempRows {
+		// Jika ID perusahaan belum ada di map, tambahkan perusahaan baru
+		if _, exists := dataMap[row.IDPerusahaan]; !exists {
+			dataMap[row.IDPerusahaan] = &RespDataPkl{
+				IDPerusahaan:    row.IDPerusahaan,
+				NamaPerusahaan:  row.NamaPerusahaan,
+				IDPembimbing:    row.IDPembimbing,
+				NamaPembimbing:  row.NamaPembimbing,
+				IDFasilitator:   row.IDFasilitator,
+				NamaFasilitator: row.NamaFasilitator,
+				DaftarSiswa:     []Siswa{},
+			}
 		}
-		rows[i].DaftarSiswa = dataSiswa
+
+		// Tambahkan siswa ke daftar
+		dataMap[row.IDPerusahaan].DaftarSiswa = append(dataMap[row.IDPerusahaan].DaftarSiswa, Siswa{
+			NIS:           row.NIS,
+			Nama:          row.NamaSiswa,
+			Kelas:         row.Kelas,
+			TanggalMasuk:  row.TanggalMasuk,
+			TanggalKeluar: row.TanggalKeluar,
+			Jurusan:       row.Jurusan,
+			Rombel:        row.Rombel,
+		})
+	}
+
+	// Ubah map menjadi slice
+	for _, value := range dataMap {
+		rows = append(rows, *value)
 	}
 
 	return rows, nil
