@@ -52,6 +52,7 @@ func SetupRouter() *gin.Engine {
 		hubin.PUT("/pkl/tanggal_masuk", Controllers.UpdateTanggalMasuk)
 		hubin.PUT("/pkl/tanggal_keluar", Controllers.UpdateTanggalKeluar)
 		hubin.DELETE("/pkl", Controllers.DeleteDataSiswaPkl)
+		hubin.GET("/pkl/raw", Controllers.RawDataPkl)
 
 		hubin.POST("/pegawai/role", Controllers.AssignRole)
 		hubin.DELETE("/pegawai/role", Controllers.DeleteRolePegawai)
@@ -94,6 +95,7 @@ func SetupRouter() *gin.Engine {
 		dashboard.GET("/jumlah-hubin", Controllers.GetJumlahHubin)
 
 		dashboard.GET("/siswa", Controllers.AllDataNilaiPKL)
+		dashboard.GET("/siswa/raw", Controllers.AllDataNilaiPKL)
 
 	}
 

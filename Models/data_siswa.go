@@ -32,18 +32,41 @@ type DataSiswa struct {
 	FKIdIndustri int      `json:"fk_id_industri" gorm:"type:int;index"`
 	Industri     Industri `gorm:"foreignKey:FKIdIndustri;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
 
-	NilaiSoftskillIndustri      int `json:"nilai_softskill_industri"`
-	NilaiSoftskillFasilitator   int `json:"nilai_softskill_fasilitator"`
-	NilaiHardskillIndustri      int `json:"nilai_hardskill_industri"`
-	NilaiHardskillPembimbing    int `json:"nilai_hardskill_pembimbing"`
-	NilaiKemandirianFasilitator int `json:"nilai_kemandirian_fasilitator"`
-	NilaiPengujianPembimbing    int `json:"nilai_pengujian_pembimbing"`
+	NilaiSoftskillIndustri      float32 `json:"nilai_softskill_industri"`
+	NilaiSoftskillFasilitator   float32 `json:"nilai_softskill_fasilitator"`
+	NilaiHardskillIndustri      float32 `json:"nilai_hardskill_industri"`
+	NilaiHardskillPembimbing    float32 `json:"nilai_hardskill_pembimbing"`
+	NilaiKemandirianFasilitator float32 `json:"nilai_kemandirian_fasilitator"`
+	NilaiPengujianPembimbing    float32 `json:"nilai_pengujian_pembimbing"`
 
 	CreatedAt                 time.Time  `json:"created_at" gorm:"type:timestamp"`
 	UpdatedAtNilaiPembimbing  *time.Time `json:"updated_at_nilai_pembimbing" gorm:"type:timestamp"`
 	UpdatedAtNilaiFasilitator *time.Time `json:"updated_at_nilai_fasilitator" gorm:"type:timestamp"`
 }
 
+type DataSiswaRaw struct {
+	NIS     string `json:"nis"`
+	Nama    string `json:"name" gorm:"type:varchar(255)"`
+	Kelas   string `json:"kelas" gorm:"type:varchar(255)"`
+	Jurusan string `json:"jurusan" gorm:"type:varchar(255)"`
+	Rombel  string `json:"rombel" gorm:"type:varchar(255)"`
+
+	Aktif bool `json:"aktif"`
+
+	TanggalMasuk  *time.Time `json:"tanggal_masuk" gorm:"date"`
+	TanggalKeluar *time.Time `json:"tanggal_keluar" gorm:"date"`
+
+	NamaPembimbing  string `json:"nama_pembimbing"`
+	NamaFasilitator string `json:"nama_fasilitator"`
+	NamaIndustri    string `json:"nama_industri"`
+	AlamatIndustri  string `json:"alamat_industri"`
+
+	// Email    string `json:"email" gorm:"type:varchar(255)"`
+	// Password string `json:"password" gorm:"type:varchar(255)"`
+
+	UpdatedAtNilaiPembimbing  *time.Time `json:"updated_at_nilai_pembimbing" gorm:"type:timestamp"`
+	UpdatedAtNilaiFasilitator *time.Time `json:"updated_at_nilai_fasilitator" gorm:"type:timestamp"`
+}
 type ReqAddDataSiswa struct {
 	NIS      string `json:"nis" gorm:"primaryKey;type:varchar(50)"`
 	Nama     string `json:"nama" gorm:"type:varchar(255)"`
@@ -279,4 +302,27 @@ func DeleteSiswaPkl(data *[]DataNis) error {
 	}
 	return nil
 
+}
+
+func GetRawDataPkl() ([]DataSiswaRaw, error) {
+	var data []DataSiswaRaw
+
+	query := `
+	SELECT ds.nis,ds.nama as nama, ds.kelas, ds.jurusan as jurusan, ds.rombel,ds.aktif,
+	ds.tanggal_masuk, ds.tanggal_keluar,
+	p.nama as nama_pembimbing, f.nama as nama_fasilitator,
+	i.nama as nama_industri, i.alamat as alamat_industri,
+	ds.updated_at_nilai_pembimbing, ds.updated_at_nilai_fasilitator
+	FROM data_siswa ds
+	JOIN industri i on i.id = ds.fk_id_industri
+	JOIN pegawai p on p.id = ds.fk_id_pembimbing
+	JOIN pegawai f on f.id = ds.fk_id_fasilitator
+	`
+
+	result := DB.Database.Raw(query).Scan(&data)
+	if result.Error != nil {
+		return nil, nil
+	}
+
+	return data, nil
 }

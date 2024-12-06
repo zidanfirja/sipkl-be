@@ -515,3 +515,13 @@ func DeleteDataSiswaPkl(c *gin.Context) {
 	})
 
 }
+
+func RawDataPkl(c *gin.Context) {
+	data, err := Models.GetRawDataPkl()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": data})
+}
