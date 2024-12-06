@@ -14,18 +14,14 @@ import (
 )
 
 type RespPegawaiGetAll struct {
-	ID        int    `gorm:"type:int;primaryKey;autoIncrement" json:"id"`
-	IdPegawai string `gorm:"type:varchar(100);not null" json:"id_pegawai"`
-	Nama      string `gorm:"type:varchar(255);not null" json:"nama"`
-	Email     string `gorm:"unique;type:varchar(100)" json:"email"`
-	Password  string `json:"password" gorm:"type:varchar(255)"`
-	Aktif     bool   `json:"aktif"`
-
-	DaftarRole []Models.RespGetRoles `json:"daftar_role" `
-	// Pembimbing       []DataSiswa        `gorm:"foreignKey:FKIdPembimbing;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
-	// Fasilitator      []DataSiswa        `gorm:"foreignKey:FKIdFasilitator;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
-
-	CreatedAt time.Time `json:"created_at" gorm:"type:timestamp"`
+	ID         int                   `json:"id"`
+	IdPegawai  string                `json:"id_pegawai"`
+	Nama       string                `json:"nama"`
+	Email      string                `json:"email"`
+	Password   string                `json:"password"`
+	Aktif      bool                  `json:"aktif"`
+	DaftarRole []Models.RespGetRoles `json:"daftar_role"`
+	CreatedAt  time.Time             `json:"created_at"`
 }
 
 func GetAllPegawai(c *gin.Context) {
@@ -39,6 +35,7 @@ func GetAllPegawai(c *gin.Context) {
 
 	var response []RespPegawaiGetAll
 	for _, item := range data {
+		// Buat daftar role dari KonfigurasiRoles
 		var roles []Models.RespGetRoles
 		for _, konfigurasiRole := range item.KonfigurasiRoles {
 			roles = append(roles, Models.RespGetRoles{
@@ -50,6 +47,7 @@ func GetAllPegawai(c *gin.Context) {
 			})
 		}
 
+		// Tambahkan pegawai ke respons
 		response = append(response, RespPegawaiGetAll{
 			ID:         item.ID,
 			IdPegawai:  item.IdPegawai,
