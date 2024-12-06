@@ -132,28 +132,28 @@ type DataNis struct {
 
 func GetDataPkl() ([]RespDataPkl, error) {
 	var rows []RespDataPkl
-	// Query yang diperluas untuk mengambil semua data dalam satu panggilan
+	// Query mengambil semua data termasuk siswa
 	query := `
-	SELECT 
-		i.id AS id_perusahaan, 
-		i.nama AS nama_perusahaan, 
-		p.id AS id_pembimbing, 
-		p.nama AS nama_pembimbing, 
-		f.id AS id_fasilitator, 
-		f.nama AS nama_fasilitator, 
-		s.nis AS nis,
-		s.nama AS nama_siswa,
-		s.kelas AS kelas,
-		s.tanggal_masuk AS tanggal_masuk,
-		s.tanggal_keluar AS tanggal_keluar,
-		s.jurusan AS jurusan,
-		s.rombel AS rombel
-	FROM data_siswa s 
-	LEFT JOIN industri i ON i.id = s.fk_id_industri 
-	LEFT JOIN pegawai p ON p.id = s.fk_id_pembimbing 
-	LEFT JOIN pegawai f ON f.id = s.fk_id_fasilitator
-	ORDER BY i.id, p.id, f.id
-	`
+		SELECT 
+			i.id AS id_perusahaan, 
+			i.nama AS nama_perusahaan, 
+			p.id AS id_pembimbing, 
+			p.nama AS nama_pembimbing, 
+			f.id AS id_fasilitator, 
+			f.nama AS nama_fasilitator, 
+			s.nis AS nis,
+			s.nama AS nama_siswa,
+			s.kelas AS kelas,
+			s.tanggal_masuk AS tanggal_masuk,
+			s.tanggal_keluar AS tanggal_keluar,
+			s.jurusan AS jurusan,
+			s.rombel AS rombel
+		FROM data_siswa s 
+		LEFT JOIN industri i ON i.id = s.fk_id_industri 
+		LEFT JOIN pegawai p ON p.id = s.fk_id_pembimbing 
+		LEFT JOIN pegawai f ON f.id = s.fk_id_fasilitator
+		ORDER BY i.id, p.id, f.id, s.nis
+		`
 
 	// Struct sementara untuk menyimpan data query
 	type TempRow struct {
@@ -180,12 +180,15 @@ func GetDataPkl() ([]RespDataPkl, error) {
 		return nil, result.Error
 	}
 
-	// Menggabungkan data menjadi struktur akhir
-	dataMap := make(map[int]*RespDataPkl)
+	// Map untuk mengelompokkan data
+	dataMap := make(map[string]*RespDataPkl)
 	for _, row := range tempRows {
-		// Jika ID perusahaan belum ada di map, tambahkan perusahaan baru
-		if _, exists := dataMap[row.IDPerusahaan]; !exists {
-			dataMap[row.IDPerusahaan] = &RespDataPkl{
+		// Buat key unik berdasarkan kombinasi id_perusahaan, id_pembimbing, dan id_fasilitator
+		key := fmt.Sprintf("%d-%d-%d", row.IDPerusahaan, row.IDPembimbing, row.IDFasilitator)
+
+		// Jika key belum ada di map, tambahkan entri baru
+		if _, exists := dataMap[key]; !exists {
+			dataMap[key] = &RespDataPkl{
 				IDPerusahaan:    row.IDPerusahaan,
 				NamaPerusahaan:  row.NamaPerusahaan,
 				IDPembimbing:    row.IDPembimbing,
@@ -196,8 +199,8 @@ func GetDataPkl() ([]RespDataPkl, error) {
 			}
 		}
 
-		// Tambahkan siswa ke daftar
-		dataMap[row.IDPerusahaan].DaftarSiswa = append(dataMap[row.IDPerusahaan].DaftarSiswa, Siswa{
+		// Tambahkan siswa ke daftar di map
+		dataMap[key].DaftarSiswa = append(dataMap[key].DaftarSiswa, Siswa{
 			NIS:           row.NIS,
 			Nama:          row.NamaSiswa,
 			Kelas:         row.Kelas,
