@@ -29,7 +29,6 @@ type RespPegawaiGetAll struct {
 }
 
 func GetAllPegawai(c *gin.Context) {
-
 	data, err := Models.GetPegawai()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -40,10 +39,15 @@ func GetAllPegawai(c *gin.Context) {
 
 	var response []RespPegawaiGetAll
 	for _, item := range data {
-
-		dataRole, err := Models.GetRoleByIdPegawai(item.ID)
-		if err != nil {
-			dataRole = nil
+		var roles []Models.RespGetRoles
+		for _, konfigurasiRole := range item.KonfigurasiRoles {
+			roles = append(roles, Models.RespGetRoles{
+				IDKonRole: konfigurasiRole.ID,
+				IDRole:    konfigurasiRole.Role.ID,
+				Nama:      konfigurasiRole.Role.Nama,
+				Aktif:     konfigurasiRole.Role.Aktif,
+				CreatedAt: konfigurasiRole.Role.CreatedAt,
+			})
 		}
 
 		response = append(response, RespPegawaiGetAll{
@@ -53,7 +57,7 @@ func GetAllPegawai(c *gin.Context) {
 			Email:      item.Email,
 			Password:   item.Password,
 			Aktif:      item.Aktif,
-			DaftarRole: dataRole,
+			DaftarRole: roles,
 			CreatedAt:  item.CreatedAt,
 		})
 	}
@@ -61,7 +65,6 @@ func GetAllPegawai(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"data": response,
 	})
-
 }
 
 func HashPassword(password string) string {
